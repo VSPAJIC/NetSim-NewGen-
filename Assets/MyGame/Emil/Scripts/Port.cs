@@ -1,47 +1,33 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Port : MonoBehaviour
 {
-    public string portName;
-    public Device parentDevice;
-    public Port connectedPort;
+    public Device parentDevice;      // PC oder Router
+    public Port connectedPort;       // der Port, zu dem dieses Port verbunden ist
 
-    // Kabel verbindet Ports
     public void ConnectTo(Port other)
     {
         connectedPort = other;
-        other.connectedPort = this;
-
         Debug.Log($"{name} verbunden mit {other.name}");
     }
 
-    public void SendPacket(Packet packet)
+    public void ReceivePacket(Packet packet, Port fromPort = null)
     {
-        if (connectedPort != null)
-        {
-            connectedPort.ReceivePacket(packet, this);
-        }
-        else
-        {
-            Debug.Log($"❌ {portName} hat keine Verbindung!");
-        }
-    }
+        Debug.Log($"{name} hat Paket erhalten von {(fromPort != null ? fromPort.name : "Start")}");
 
-    public void ReceivePacket(Packet packet, Port fromPort)
-    {
-        if (packet.visitedPorts.Contains(this))
-            return;
+        if (packet.visitedPorts.Contains(this)) return;
 
         packet.visitedPorts.Add(this);
 
-        // Ziel erreicht?
+        // Ziel erreicht
         if (parentDevice == packet.destination)
         {
-            Debug.Log($"✅ {packet.source.deviceName} hat erfolgreich {parentDevice.deviceName} erreicht!");
+            Debug.Log($"{packet.source.deviceName} hat erfolgreich {parentDevice.deviceName} erreicht!");
             return;
         }
 
-        // Router vorhanden?
+        // Router-Weiterleitung
         Router router = parentDevice.GetComponent<Router>();
         if (router != null)
         {
@@ -49,10 +35,14 @@ public class Port : MonoBehaviour
             return;
         }
 
-        // Normale Weiterleitung (PC)
+        // Normale Verbindung
         if (connectedPort != null && connectedPort != fromPort)
         {
             connectedPort.ReceivePacket(packet, this);
+        }
+        else
+        {
+            Debug.Log($"{name} kann Paket nicht weiterleiten.");
         }
     }
 }

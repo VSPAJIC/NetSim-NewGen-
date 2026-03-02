@@ -6,21 +6,20 @@ public class Device : MonoBehaviour
     public string deviceName;
     public List<Port> ports = new List<Port>();
 
-    // Ping starten (nur für PCs sinnvoll)
     public void Ping(Device target)
     {
-        Debug.Log($"{deviceName} pingt {target.deviceName}");
+        Packet packet = new Packet
+        {
+            source = this,
+            destination = target
+        };
 
         if (ports.Count == 0)
         {
-            Debug.Log("❌ Keine Ports vorhanden!");
+            Debug.LogWarning($"{deviceName} hat keine Ports!");
             return;
         }
 
-        Packet packet = new Packet();
-        packet.source = this;
-        packet.destination = target;
-
-        ports[0].SendPacket(packet);
+        ports[0].ReceivePacket(packet); // Ping startet vom ersten Port
     }
 }

@@ -2,14 +2,21 @@ using UnityEngine;
 
 public class PingTest : MonoBehaviour
 {
-    public Device pc1;
-    public Device pc2;
+    public Device sourceDevice;
+    public Device targetDevice;
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            pc1.Ping(pc2);
+            if (sourceDevice == null || targetDevice == null)
+            {
+                Debug.Log("PingTest: Geräte nicht zugewiesen!");
+                return;
+            }
+
+            Debug.Log($"📡 {sourceDevice.deviceName} startet Ping zu {targetDevice.deviceName}");
+            sourceDevice.Ping(targetDevice);
         }
     }
 }

@@ -1,21 +1,18 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Router : MonoBehaviour
 {
-    public Device device;
-
-    void Awake()
-    {
-        device = GetComponent<Device>();
-    }
+    public List<Port> ports = new List<Port>();
 
     public void ForwardPacket(Packet packet, Port fromPort)
     {
-        foreach (Port port in device.ports)
+        foreach (Port p in ports)
         {
-            if (port != fromPort && port.connectedPort != null)
+            if (p != fromPort)
             {
-                port.connectedPort.ReceivePacket(packet, port);
+                Debug.Log($"{name} sendet Paket von {fromPort.name} an {p.name}");
+                p.ReceivePacket(packet, fromPort);
             }
         }
     }

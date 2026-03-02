@@ -151,8 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88dd3f07838e2d44293386325c5295b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portName: 
-  parentDevice: {fileID: 0}
+  parentDevice: {fileID: 537540267}
   connectedPort: {fileID: 0}
 --- !u!65 &143116294
 BoxCollider:
@@ -275,8 +274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88dd3f07838e2d44293386325c5295b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portName: 
-  parentDevice: {fileID: 0}
+  parentDevice: {fileID: 1868924335}
   connectedPort: {fileID: 0}
 --- !u!65 &315408163
 BoxCollider:
@@ -399,8 +397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88dd3f07838e2d44293386325c5295b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portName: 
-  parentDevice: {fileID: 0}
+  parentDevice: {fileID: 1868924335}
   connectedPort: {fileID: 0}
 --- !u!65 &369179824
 BoxCollider:
@@ -815,7 +812,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 801906374}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f58b18eb507d1ce439bf6d1f1c9fa3f9, type: 3}
+  m_Script: {fileID: 11500000, guid: 792c7c65b00ef04428c6b9470f98f86a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   sourceDevice: {fileID: 537540267}
@@ -1205,8 +1202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88dd3f07838e2d44293386325c5295b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portName: 
-  parentDevice: {fileID: 0}
+  parentDevice: {fileID: 1193620034}
   connectedPort: {fileID: 0}
 --- !u!65 &1362281432
 BoxCollider:
@@ -1330,7 +1326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d5080088087c2c4899a8c7d4984aa93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  device: {fileID: 1868924335}
+  ports: []
 --- !u!114 &1868924335
 MonoBehaviour:
   m_ObjectHideFlags: 0
