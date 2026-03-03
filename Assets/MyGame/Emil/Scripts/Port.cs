@@ -3,31 +3,32 @@ using UnityEngine;
 
 public class Port : MonoBehaviour
 {
-    public Device parentDevice;      // PC oder Router
-    public Port connectedPort;       // der Port, zu dem dieses Port verbunden ist
+    public Device parentDevice;
+    public Port connectedPort;
 
     public void ConnectTo(Port other)
     {
         connectedPort = other;
-        Debug.Log($"{name} verbunden mit {other.name}");
+        Debug.Log($"🔗 {name} verbunden mit {other.name}");
     }
 
     public void ReceivePacket(Packet packet, Port fromPort = null)
     {
-        Debug.Log($"{name} hat Paket erhalten von {(fromPort != null ? fromPort.name : "Start")}");
-
-        if (packet.visitedPorts.Contains(this)) return;
+        if (packet.visitedPorts.Contains(this))
+            return;
 
         packet.visitedPorts.Add(this);
 
-        // Ziel erreicht
+        Debug.Log($"📥 {name} bekommt Paket");
+
+        // Ziel erreicht?
         if (parentDevice == packet.destination)
         {
-            Debug.Log($"{packet.source.deviceName} hat erfolgreich {parentDevice.deviceName} erreicht!");
+            Debug.Log($"✅ {packet.source.deviceName} hat {parentDevice.deviceName} erreicht!");
             return;
         }
 
-        // Router-Weiterleitung
+        // Router?
         Router router = parentDevice.GetComponent<Router>();
         if (router != null)
         {
@@ -35,14 +36,14 @@ public class Port : MonoBehaviour
             return;
         }
 
-        // Normale Verbindung
+        // Normal weiterleiten
         if (connectedPort != null && connectedPort != fromPort)
         {
             connectedPort.ReceivePacket(packet, this);
         }
         else
         {
-            Debug.Log($"{name} kann Paket nicht weiterleiten.");
+            Debug.Log($"❌ {name} kann nicht weiterleiten.");
         }
     }
 }
