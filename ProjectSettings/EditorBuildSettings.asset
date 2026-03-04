@@ -8,6 +8,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MyGame/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/MyGame/Viktor/ViktorScene.unity
+    guid: 5204392c01d781349b186081ccd6b334
+  - enabled: 1
+    path: Assets/MyGame/Viktor/ConfigScene.unity
+    guid: bd82d07f55250644e9e1a2a3b9332ca3
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
