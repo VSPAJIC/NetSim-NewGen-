@@ -4,17 +4,33 @@ public class Router : MonoBehaviour
 {
     public void ForwardPacket(Packet packet, Port incomingPort)
     {
-        Debug.Log($"🔁 Router {name} leitet weiter...");
+        Debug.Log($"Router {name} leitet weiter...");
+        Debug.Log($"Eingehender Port: {incomingPort.name}");
 
         Port[] ports = GetComponentsInChildren<Port>();
 
         foreach (Port port in ports)
         {
-            // Nicht zurück an den Port senden, von dem es kam
+            Debug.Log($"Prüfe {port.name}");
+            Debug.Log($"Ist Incoming? {port == incomingPort}");
+            Debug.Log($"ConnectedPort: {port.connectedPort}");
+        }
+
+        bool forwarded = false;
+
+        foreach (Port port in ports)
+        {
             if (port != incomingPort && port.connectedPort != null)
             {
-                port.connectedPort.ReceivePacket(packet, port);
+                Debug.Log($"Weiterleitung über {port.name}");
+                port.connectedPort.ReceivePacket(packet);
+                forwarded = true;
             }
+        }
+
+        if (!forwarded)
+        {
+            Debug.LogError("KEIN Ausgangsport gefunden!");
         }
     }
 }

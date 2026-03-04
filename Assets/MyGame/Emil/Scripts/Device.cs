@@ -10,7 +10,7 @@ public class Device : MonoBehaviour
     {
         if (ports.Count == 0)
         {
-            Debug.Log("❌ Keine Ports vorhanden!");
+            Debug.Log("Keine Ports vorhanden!");
             return;
         }
 
@@ -20,7 +20,7 @@ public class Device : MonoBehaviour
             destination = target
         };
 
-        Debug.Log($"📡 {deviceName} pingt {target.deviceName}");
+        Debug.Log($"{deviceName} pingt {target.deviceName}");
         ports[0].ReceivePacket(packet);
     }
 }

@@ -30,34 +30,59 @@ public class Cable : MonoBehaviour
         DrawCable();
     }
 
+    // ===============================
+    // START PORT
+    // ===============================
     public void SetPortA(GameObject startPort)
     {
         portA = startPort;
         points.Add(startPort.transform);
     }
 
+    // ===============================
+    // WAYPOINT
+    // ===============================
     public void AddWaypoint(GameObject waypoint)
     {
         CreateSegment(points[points.Count - 1].gameObject, waypoint);
         points.Add(waypoint.transform);
     }
 
+    // ===============================
+    // END PORT
+    // ===============================
     public void SetPortB(GameObject endPort)
     {
         portB = endPort;
+
         CreateSegment(points[points.Count - 1].gameObject, endPort);
         points.Add(endPort.transform);
 
-        // ⚡ Beide Ports verbinden
+        ConnectPorts();
+    }
+
+    // ===============================
+    // LOGISCHE VERBINDUNG
+    // ===============================
+    void ConnectPorts()
+    {
         Port portAScript = portA.GetComponent<Port>();
         Port portBScript = portB.GetComponent<Port>();
+
         if (portAScript != null && portBScript != null)
         {
             portAScript.ConnectTo(portBScript);
-            portBScript.ConnectTo(portAScript);
+            Debug.Log($"{portAScript.name} <--> {portBScript.name}");
+        }
+        else
+        {
+            Debug.LogWarning("Einer der Ports hat kein Port-Script!");
         }
     }
 
+    // ===============================
+    // SEGMENT ERSTELLUNG
+    // ===============================
     void CreateSegment(GameObject from, GameObject to)
     {
         int segmentIndex = transform.childCount;
@@ -73,6 +98,9 @@ public class Cable : MonoBehaviour
         segment.Setup(from, to);
     }
 
+    // ===============================
+    // LINE RENDERER
+    // ===============================
     void DrawCable()
     {
         if (points.Count < 2) return;

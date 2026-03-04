@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Port : MonoBehaviour
@@ -9,22 +8,25 @@ public class Port : MonoBehaviour
     public void ConnectTo(Port other)
     {
         connectedPort = other;
-        Debug.Log($"🔗 {name} verbunden mit {other.name}");
+        other.connectedPort = this;
+
+        Debug.Log($"{name} <--> {other.name}");
     }
 
-    public void ReceivePacket(Packet packet, Port fromPort = null)
+    public void ReceivePacket(Packet packet)
     {
+        // Loop verhindern
         if (packet.visitedPorts.Contains(this))
             return;
 
         packet.visitedPorts.Add(this);
 
-        Debug.Log($"📥 {name} bekommt Paket");
+        Debug.Log($"{name} bekommt Paket");
 
         // Ziel erreicht?
         if (parentDevice == packet.destination)
         {
-            Debug.Log($"✅ {packet.source.deviceName} hat {parentDevice.deviceName} erreicht!");
+            Debug.Log($"{packet.source.deviceName} hat {parentDevice.deviceName} erreicht!");
             return;
         }
 
@@ -37,13 +39,13 @@ public class Port : MonoBehaviour
         }
 
         // Normal weiterleiten
-        if (connectedPort != null && connectedPort != fromPort)
+        if (connectedPort != null)
         {
-            connectedPort.ReceivePacket(packet, this);
+            connectedPort.ReceivePacket(packet);
         }
         else
         {
-            Debug.Log($"❌ {name} kann nicht weiterleiten.");
+            Debug.Log($"{name} hat keine Verbindung!");
         }
     }
 }
