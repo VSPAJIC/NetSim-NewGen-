@@ -384,8 +384,8 @@ GameObject:
   - component: {fileID: 193410409}
   - component: {fileID: 193410411}
   - component: {fileID: 193410410}
-  - component: {fileID: 193410413}
   - component: {fileID: 193410414}
+  - component: {fileID: 193410415}
   m_Layer: 5
   m_Name: PC1
   m_TagString: Untagged
@@ -448,7 +448,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 193410408}
   m_CullTransparentMesh: 1
---- !u!114 &193410413
+--- !u!114 &193410414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 193410408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ee7e398d12beeb4fb6f30b2ecc6d4a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pcID: PC1
+--- !u!114 &193410415
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -494,7 +507,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 193410414}
         m_TargetAssemblyTypeName: PCOpener, Assembly-CSharp
-        m_MethodName: LoadConfigScene
+        m_MethodName: LoadPCConfig
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -504,19 +517,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &193410414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 193410408}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ee7e398d12beeb4fb6f30b2ecc6d4a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pcID: PC1
 --- !u!1001 &343760034
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -697,7 +697,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 715744416}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 715744420}
+        m_TargetAssemblyTypeName: PCOpener, Assembly-CSharp
+        m_MethodName: LoadPCConfig
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &715744419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1527,7 +1539,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1085231462}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1085231466}
+        m_TargetAssemblyTypeName: PCOpener, Assembly-CSharp
+        m_MethodName: LoadPCConfig
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1085231465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2369,7 +2393,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1868313996}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1868314000}
+        m_TargetAssemblyTypeName: PCOpener, Assembly-CSharp
+        m_MethodName: LoadPCConfig
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1868314000
 MonoBehaviour:
   m_ObjectHideFlags: 0
