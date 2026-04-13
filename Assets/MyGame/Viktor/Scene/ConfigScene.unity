@@ -384,8 +384,8 @@ GameObject:
   - component: {fileID: 193410409}
   - component: {fileID: 193410411}
   - component: {fileID: 193410410}
-  - component: {fileID: 193410413}
-  - component: {fileID: 193410412}
+  - component: {fileID: 193410414}
+  - component: {fileID: 193410415}
   m_Layer: 5
   m_Name: PC1
   m_TagString: Untagged
@@ -448,7 +448,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 193410408}
   m_CullTransparentMesh: 1
---- !u!114 &193410412
+--- !u!114 &193410414
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -457,11 +457,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 193410408}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9045e8eb750a34140a1cc76952caf03b, type: 3}
+  m_Script: {fileID: 11500000, guid: 0ee7e398d12beeb4fb6f30b2ecc6d4a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: PcConfigScene
---- !u!114 &193410413
+  pcID: PC1
+--- !u!114 &193410415
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -505,9 +505,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 193410412}
-        m_TargetAssemblyTypeName: LoadSceneOnClick, Assembly-CSharp
-        m_MethodName: LoadScene
+      - m_Target: {fileID: 193410414}
+        m_TargetAssemblyTypeName: PCOpener, Assembly-CSharp
+        m_MethodName: LoadPCConfig
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -591,6 +591,7 @@ GameObject:
   - component: {fileID: 715744416}
   - component: {fileID: 715744419}
   - component: {fileID: 715744418}
+  - component: {fileID: 715744420}
   m_Layer: 5
   m_Name: PC2
   m_TagString: Untagged
@@ -697,9 +698,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 715744419}
-        m_TargetAssemblyTypeName: LoadSceneOnClick, Assembly-CSharp
-        m_MethodName: LoadScene
+      - m_Target: {fileID: 715744420}
+        m_TargetAssemblyTypeName: PCOpener, Assembly-CSharp
+        m_MethodName: LoadPCConfig
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -722,6 +723,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: PcConfigScene
+--- !u!114 &715744420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 715744414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ee7e398d12beeb4fb6f30b2ecc6d4a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pcID: PC2
 --- !u!1 &823746829
 GameObject:
   m_ObjectHideFlags: 0
@@ -1419,6 +1433,7 @@ GameObject:
   - component: {fileID: 1085231462}
   - component: {fileID: 1085231465}
   - component: {fileID: 1085231464}
+  - component: {fileID: 1085231466}
   m_Layer: 5
   m_Name: PC4
   m_TagString: Untagged
@@ -1525,9 +1540,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1085231465}
-        m_TargetAssemblyTypeName: LoadSceneOnClick, Assembly-CSharp
-        m_MethodName: LoadScene
+      - m_Target: {fileID: 1085231466}
+        m_TargetAssemblyTypeName: PCOpener, Assembly-CSharp
+        m_MethodName: LoadPCConfig
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1550,6 +1565,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: PcConfigScene
+--- !u!114 &1085231466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1085231460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ee7e398d12beeb4fb6f30b2ecc6d4a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pcID: PC4
 --- !u!1001 &1219263720
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2259,7 +2287,7 @@ GameObject:
   - component: {fileID: 1868313997}
   - component: {fileID: 1868313996}
   - component: {fileID: 1868313999}
-  - component: {fileID: 1868313998}
+  - component: {fileID: 1868314000}
   m_Layer: 5
   m_Name: PC3
   m_TagString: Untagged
@@ -2322,19 +2350,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1868313994}
   m_CullTransparentMesh: 1
---- !u!114 &1868313998
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1868313994}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9045e8eb750a34140a1cc76952caf03b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneName: PcConfigScene
 --- !u!114 &1868313999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2379,9 +2394,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1868313998}
-        m_TargetAssemblyTypeName: LoadSceneOnClick, Assembly-CSharp
-        m_MethodName: LoadScene
+      - m_Target: {fileID: 1868314000}
+        m_TargetAssemblyTypeName: PCOpener, Assembly-CSharp
+        m_MethodName: LoadPCConfig
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2391,6 +2406,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1868314000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868313994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ee7e398d12beeb4fb6f30b2ecc6d4a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pcID: PC3
 --- !u!1 &1878289717
 GameObject:
   m_ObjectHideFlags: 0
