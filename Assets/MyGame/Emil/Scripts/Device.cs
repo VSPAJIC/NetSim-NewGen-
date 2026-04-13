@@ -17,10 +17,31 @@ public class Device : MonoBehaviour
         Packet packet = new Packet
         {
             source = this,
-            destination = target
+            destination = target,
+            isBroadcast = false
         };
 
-        Debug.Log($"{deviceName} pingt {target.deviceName}");
+        Debug.Log($"📡 {deviceName} pingt {target.deviceName}");
+        ports[0].ReceivePacket(packet);
+    }
+
+    // 🔥 NEU
+    public void BroadcastPing()
+    {
+        if (ports.Count == 0)
+        {
+            Debug.Log("Keine Ports vorhanden!");
+            return;
+        }
+
+        Packet packet = new Packet
+        {
+            source = this,
+            destination = null,
+            isBroadcast = true
+        };
+
+        Debug.Log($"📡 {deviceName} startet BROADCAST Ping");
         ports[0].ReceivePacket(packet);
     }
 }

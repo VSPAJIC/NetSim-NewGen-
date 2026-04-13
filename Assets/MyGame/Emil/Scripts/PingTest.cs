@@ -7,6 +7,7 @@ public class PingTest : MonoBehaviour
 
     void Update()
     {
+        // Normaler Ping
         if (Input.GetKeyDown(KeyCode.P))
         {
             if (sourceDevice == null || targetDevice == null)
@@ -17,6 +18,18 @@ public class PingTest : MonoBehaviour
 
             Debug.Log($"📡 {sourceDevice.deviceName} startet Ping zu {targetDevice.deviceName}");
             sourceDevice.Ping(targetDevice);
+        }
+
+        // 🔥 Broadcast Ping
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            if (sourceDevice == null)
+            {
+                Debug.Log("PingTest: Source nicht gesetzt!");
+                return;
+            }
+
+            sourceDevice.BroadcastPing();
         }
     }
 }

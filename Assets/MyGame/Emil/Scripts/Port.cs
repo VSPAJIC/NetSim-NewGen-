@@ -5,7 +5,7 @@ public class Port : MonoBehaviour
     public Device parentDevice;
     public Port connectedPort;
 
-    public int vlanID = 1; // 🔥 VLAN am Port
+    public int vlanID = -1; // 🔥 -1 = kein VLAN (nur Switch nutzt VLAN)
 
     void Awake()
     {
@@ -28,16 +28,27 @@ public class Port : MonoBehaviour
 
         packet.visitedPorts.Add(this);
 
-        Debug.Log($"{name} bekommt Paket (VLAN {vlanID})");
+        Debug.Log($"{name} bekommt Paket");
 
-        // 🎯 Ziel erreicht?
-        if (parentDevice == packet.destination)
+        // 🔥 Broadcast
+        if (packet.isBroadcast)
         {
-            Debug.Log($"✅ {packet.source.deviceName} hat {parentDevice.deviceName} erreicht!");
-            return;
+            if (parentDevice != packet.source)
+            {
+                Debug.Log($"📡 Broadcast erreicht: {parentDevice.deviceName}");
+            }
+        }
+        else
+        {
+            // 🎯 Ziel erreicht?
+            if (parentDevice == packet.destination)
+            {
+                Debug.Log($"✅ {packet.source.deviceName} hat {parentDevice.deviceName} erreicht!");
+                return;
+            }
         }
 
-        // 🔥 SWITCH zuerst prüfen
+        // 🔥 SWITCH zuerst
         Switch sw = parentDevice.GetComponent<Switch>();
         if (sw != null)
         {

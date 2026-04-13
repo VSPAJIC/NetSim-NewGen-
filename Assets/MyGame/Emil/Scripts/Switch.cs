@@ -8,6 +8,10 @@ public class Switch : MonoBehaviour
 
         int vlan = incomingPort.vlanID;
 
+        // Default VLAN wenn keiner gesetzt
+        if (vlan == -1)
+            vlan = 1;
+
         Port[] ports = GetComponentsInChildren<Port>();
 
         foreach (Port port in ports)
@@ -16,8 +20,8 @@ public class Switch : MonoBehaviour
             if (port == incomingPort)
                 continue;
 
-            // ❗ VLAN FILTER
-            if (port.vlanID != vlan)
+            // ❗ VLAN FILTER (nur wenn Port VLAN gesetzt hat)
+            if (port.vlanID != -1 && port.vlanID != vlan)
                 continue;
 
             if (port.connectedPort != null)
