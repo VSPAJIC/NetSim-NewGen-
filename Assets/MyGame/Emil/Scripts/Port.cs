@@ -5,6 +5,13 @@ public class Port : MonoBehaviour
     public Device parentDevice;
     public Port connectedPort;
 
+    public int vlanID = 1; // 🔥 VLAN am Port
+
+    void Awake()
+    {
+        parentDevice = GetComponentInParent<Device>();
+    }
+
     public void ConnectTo(Port other)
     {
         connectedPort = other;
@@ -15,22 +22,30 @@ public class Port : MonoBehaviour
 
     public void ReceivePacket(Packet packet)
     {
-        // Loop verhindern
+        // ❗ Loop verhindern
         if (packet.visitedPorts.Contains(this))
             return;
 
         packet.visitedPorts.Add(this);
 
-        Debug.Log($"{name} bekommt Paket");
+        Debug.Log($"{name} bekommt Paket (VLAN {vlanID})");
 
-        // Ziel erreicht?
+        // 🎯 Ziel erreicht?
         if (parentDevice == packet.destination)
         {
-            Debug.Log($"{packet.source.deviceName} hat {parentDevice.deviceName} erreicht!");
+            Debug.Log($"✅ {packet.source.deviceName} hat {parentDevice.deviceName} erreicht!");
             return;
         }
 
-        // Router?
+        // 🔥 SWITCH zuerst prüfen
+        Switch sw = parentDevice.GetComponent<Switch>();
+        if (sw != null)
+        {
+            sw.ForwardPacket(packet, this);
+            return;
+        }
+
+        // 🔥 ROUTER danach
         Router router = parentDevice.GetComponent<Router>();
         if (router != null)
         {
@@ -38,7 +53,7 @@ public class Port : MonoBehaviour
             return;
         }
 
-        // Normal weiterleiten
+        // 🔁 Normal weiterleiten
         if (connectedPort != null)
         {
             connectedPort.ReceivePacket(packet);
