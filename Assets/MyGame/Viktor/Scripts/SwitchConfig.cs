@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using System.IO;
 
 public class SwitchConfig : MonoBehaviour
 {
@@ -13,8 +14,12 @@ public class SwitchConfig : MonoBehaviour
     private Dictionary<int, List<string>> vlans = new Dictionary<int, List<string>>();
     private Dictionary<string, int> interfaceVlan = new Dictionary<string, int>();
 
+    private string deviceID = "Switch";
+
     private void Start()
     {
+        LoadConfig();
+
         inputField.lineType = TMP_InputField.LineType.MultiLineSubmit;
         inputField.text = prompt;
         MoveCaretToEnd();
@@ -68,28 +73,21 @@ public class SwitchConfig : MonoBehaviour
 
     private void HandleCommand(string cmd)
     {
-        // enable
         if (cmd == "enable" && mode == "user")
         {
             mode = "privileged";
             prompt = "Switch# ";
         }
-
-        // disable
         else if (cmd == "disable" && mode == "privileged")
         {
             mode = "user";
             prompt = "Switch> ";
         }
-
-        // config mode
         else if ((cmd == "configure terminal" || cmd == "conf t") && mode == "privileged")
         {
             mode = "config";
             prompt = "Switch(config)# ";
         }
-
-        // exit
         else if (cmd == "exit")
         {
             if (mode == "interface" || mode == "vlan")
@@ -112,8 +110,7 @@ public class SwitchConfig : MonoBehaviour
         // VLAN erstellen
         else if (cmd.StartsWith("vlan ") && mode == "config")
         {
-            int vlanId;
-            if (!int.TryParse(cmd.Split(' ')[1], out vlanId))
+            if (!int.TryParse(cmd.Split(' ')[1], out int vlanId))
             {
                 AddOutput("% Invalid VLAN ID");
                 return;
@@ -122,11 +119,13 @@ public class SwitchConfig : MonoBehaviour
             if (!vlans.ContainsKey(vlanId))
                 vlans[vlanId] = new List<string>();
 
+            AddOutput("VLAN " + vlanId + " created");
+
             mode = "vlan";
             prompt = "Switch(config-vlan)# ";
         }
 
-        // interface
+        // Interface auswählen
         else if (cmd.StartsWith("interface ") && mode == "config")
         {
             currentInterface = cmd.Split(' ')[1];
@@ -134,19 +133,18 @@ public class SwitchConfig : MonoBehaviour
             prompt = "Switch(config-if)# ";
         }
 
-        // switchport mode access
+        // Access Mode
         else if (cmd == "switchport mode access" && mode == "interface")
         {
             AddOutput("Access mode set");
         }
 
-        // switchport access vlan
+        // VLAN zuweisen
         else if (cmd.StartsWith("switchport access vlan") && mode == "interface")
         {
             string[] parts = cmd.Split(' ');
-            int vlanId;
 
-            if (parts.Length < 4 || !int.TryParse(parts[3], out vlanId))
+            if (parts.Length < 4 || !int.TryParse(parts[3], out int vlanId))
             {
                 AddOutput("% Invalid VLAN");
                 return;
@@ -159,6 +157,11 @@ public class SwitchConfig : MonoBehaviour
             }
 
             interfaceVlan[currentInterface] = vlanId;
+
+            // Auch in VLAN-Liste speichern
+            if (!vlans[vlanId].Contains(currentInterface))
+                vlans[vlanId].Add(currentInterface);
+
             AddOutput("Assigned VLAN " + vlanId + " to " + currentInterface);
         }
 
@@ -171,49 +174,93 @@ public class SwitchConfig : MonoBehaviour
             {
                 string line = vlan.Key + "   VLAN" + vlan.Key + "   ";
 
-                foreach (var iface in interfaceVlan)
+                foreach (string iface in vlan.Value)
                 {
-                    if (iface.Value == vlan.Key)
-                        line += iface.Key + " ";
+                    line += iface + " ";
                 }
 
                 AddOutput(line);
             }
         }
 
-        // save
+        // SAVE
         else if (cmd == "save" || cmd == "write memory")
         {
+            SaveConfig();
             AddOutput("Building configuration...");
             AddOutput("[OK]");
         }
 
-        // clear
         else if (cmd == "clear")
         {
             inputField.text = prompt;
-        }
-
-        // help
-        else if (cmd == "help" || cmd == "?")
-        {
-            AddOutput("Available commands:");
-            AddOutput("enable");
-            AddOutput("conf t");
-            AddOutput("vlan 10");
-            AddOutput("interface fa0/1");
-            AddOutput("switchport mode access");
-            AddOutput("switchport access vlan 10");
-            AddOutput("show vlan");
-            AddOutput("save");
-            AddOutput("clear");
-            AddOutput("exit");
         }
 
         else
         {
             AddOutput("% Invalid input detected");
         }
+    }
+
+    // 💾 SPEICHERN
+    private void SaveConfig()
+    {
+        SwitchConfigData data = new SwitchConfigData();
+
+        data.vlans = new List<VlanData>();
+        data.interfaceVlans = new List<InterfaceVlanData>();
+
+        foreach (var vlan in vlans)
+        {
+            data.vlans.Add(new VlanData { vlanId = vlan.Key });
+        }
+
+        foreach (var iface in interfaceVlan)
+        {
+            data.interfaceVlans.Add(new InterfaceVlanData
+            {
+                interfaceName = iface.Key,
+                vlanId = iface.Value
+            });
+        }
+
+        string json = JsonUtility.ToJson(data, true);
+        File.WriteAllText(GetFilePath(), json);
+    }
+
+    // 📂 LADEN
+    private void LoadConfig()
+    {
+        string path = GetFilePath();
+
+        if (!File.Exists(path))
+            return;
+
+        string json = File.ReadAllText(path);
+        SwitchConfigData data = JsonUtility.FromJson<SwitchConfigData>(json);
+
+        vlans.Clear();
+        interfaceVlan.Clear();
+
+        foreach (var vlan in data.vlans)
+        {
+            vlans[vlan.vlanId] = new List<string>();
+        }
+
+        foreach (var iface in data.interfaceVlans)
+        {
+            interfaceVlan[iface.interfaceName] = iface.vlanId;
+
+            if (!vlans.ContainsKey(iface.vlanId))
+                vlans[iface.vlanId] = new List<string>();
+
+            vlans[iface.vlanId].Add(iface.interfaceName);
+        }
+    }
+
+    private string GetFilePath()
+    {
+        return Path.Combine(Application.persistentDataPath, deviceID + "_switch.json");
     }
 
     private void AddOutput(string text)

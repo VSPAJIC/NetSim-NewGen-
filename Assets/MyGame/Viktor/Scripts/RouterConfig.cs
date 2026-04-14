@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using System.IO;
 
 public class RouterConfig : MonoBehaviour
 {
@@ -13,12 +14,12 @@ public class RouterConfig : MonoBehaviour
     private Dictionary<string, List<string>> interfaceConfigs = new Dictionary<string, List<string>>();
     private List<string> startupConfig = new List<string>();
 
+    private string deviceID = "Router";
+
     private const string SessionTextKey = "RouterCLI_SessionText";
     private const string ModeKey = "RouterCLI_Mode";
     private const string PromptKey = "RouterCLI_Prompt";
     private const string CurrentInterfaceKey = "RouterCLI_CurrentInterface";
-    private const string RunningConfigKey = "RouterCLI_RunningConfig";
-    private const string StartupConfigKey = "RouterCLI_StartupConfig";
 
     private void Awake()
     {
@@ -32,6 +33,7 @@ public class RouterConfig : MonoBehaviour
 
         inputField.lineType = TMP_InputField.LineType.MultiLineSubmit;
 
+        LoadConfigFile();
         LoadSession();
 
         if (string.IsNullOrEmpty(inputField.text))
@@ -106,34 +108,28 @@ public class RouterConfig : MonoBehaviour
 
     private void HandleCommand(string cmd)
     {
-        // enable
         if (cmd == "enable" && mode == "user")
         {
             mode = "privileged";
             prompt = "Router# ";
         }
-
-        // disable
         else if (cmd == "disable" && mode == "privileged")
         {
             mode = "user";
             prompt = "Router> ";
         }
-
-        // configure terminal / conf t
         else if ((cmd == "configure terminal" || cmd == "conf t") && mode == "privileged")
         {
             mode = "config";
             prompt = "Router(config)# ";
         }
-
-        // exit
         else if (cmd == "exit")
         {
             if (mode == "subinterface" || mode == "interface")
             {
                 mode = "config";
                 prompt = "Router(config)# ";
+                currentInterface = "";
             }
             else if (mode == "config")
             {
@@ -146,41 +142,32 @@ public class RouterConfig : MonoBehaviour
                 prompt = "Router> ";
             }
         }
-
-        // end
         else if (cmd == "end")
         {
             mode = "privileged";
             prompt = "Router# ";
+            currentInterface = "";
         }
-
-        // clear
         else if (cmd == "clear")
         {
             inputField.text = prompt;
         }
-
-        // save / write memory / copy running-config startup-config
         else if ((cmd == "save" || cmd == "write memory" || cmd == "copy running-config startup-config") && mode == "privileged")
         {
             SaveStartupConfig();
+            SaveConfigFile();
+
             AddOutput("Building configuration...");
             AddOutput("[OK]");
         }
-
-        // show running-config
         else if (cmd == "show running-config" && mode == "privileged")
         {
             ShowRunningConfig();
         }
-
-        // show startup-config
         else if (cmd == "show startup-config" && mode == "privileged")
         {
             ShowStartupConfig();
         }
-
-        // interface
         else if (cmd.StartsWith("interface ") && mode == "config")
         {
             string[] parts = cmd.Split(' ');
@@ -207,8 +194,6 @@ public class RouterConfig : MonoBehaviour
                 prompt = "Router(config-if)# ";
             }
         }
-
-        // encapsulation dot1Q
         else if (cmd.StartsWith("encapsulation dot1q ") && mode == "subinterface")
         {
             string[] parts = cmd.Split(' ');
@@ -218,10 +203,8 @@ public class RouterConfig : MonoBehaviour
                 return;
             }
 
-            AddInterfaceConfigLine(currentInterface, " encapsulation dot1Q " + parts[2]);
+            AddOrReplaceInterfaceConfigLine(currentInterface, "encapsulation dot1Q ", " encapsulation dot1Q " + parts[2]);
         }
-
-        // ip address
         else if (cmd.StartsWith("ip address ") && (mode == "subinterface" || mode == "interface"))
         {
             string[] parts = cmd.Split(' ');
@@ -231,16 +214,27 @@ public class RouterConfig : MonoBehaviour
                 return;
             }
 
-            AddInterfaceConfigLine(currentInterface, " ip address " + parts[2] + " " + parts[3]);
-        }
+            string ip = parts[2];
+            string subnet = parts[3];
 
-        // no shutdown
+            if (!IsValidIPv4(ip))
+            {
+                AddOutput("% Invalid IP address");
+                return;
+            }
+
+            if (!IsValidSubnetMask(subnet))
+            {
+                AddOutput("% Invalid subnet mask");
+                return;
+            }
+
+            AddOrReplaceInterfaceConfigLine(currentInterface, "ip address ", " ip address " + ip + " " + subnet);
+        }
         else if (cmd == "no shutdown" && mode == "interface")
         {
-            AddInterfaceConfigLine(currentInterface, " no shutdown");
+            AddOrReplaceInterfaceConfigLine(currentInterface, "no shutdown", " no shutdown");
         }
-
-        // help
         else if (cmd == "help" || cmd == "?")
         {
             AddOutput("Available commands:");
@@ -262,21 +256,28 @@ public class RouterConfig : MonoBehaviour
             AddOutput("exit");
             AddOutput("end");
         }
-
-        // unknown
         else
         {
             AddOutput("% Invalid input detected");
         }
     }
 
-    private void AddInterfaceConfigLine(string iface, string line)
+    private void AddOrReplaceInterfaceConfigLine(string iface, string startsWithKey, string newLine)
     {
         if (!interfaceConfigs.ContainsKey(iface))
             interfaceConfigs[iface] = new List<string>();
 
-        if (!interfaceConfigs[iface].Contains(line))
-            interfaceConfigs[iface].Add(line);
+        for (int i = 0; i < interfaceConfigs[iface].Count; i++)
+        {
+            string trimmed = interfaceConfigs[iface][i].TrimStart();
+            if (trimmed.StartsWith(startsWithKey))
+            {
+                interfaceConfigs[iface][i] = newLine;
+                return;
+            }
+        }
+
+        interfaceConfigs[iface].Add(newLine);
     }
 
     private void ShowRunningConfig()
@@ -328,6 +329,117 @@ public class RouterConfig : MonoBehaviour
         startupConfig.Add("end");
     }
 
+    private void SaveConfigFile()
+    {
+        RouterConfigData data = new RouterConfigData();
+
+        foreach (var kvp in interfaceConfigs)
+        {
+            RouterInterfaceData ifaceData = new RouterInterfaceData();
+            ifaceData.interfaceName = kvp.Key;
+            ifaceData.configLines = new List<string>(kvp.Value);
+            data.interfaces.Add(ifaceData);
+        }
+
+        data.startupConfig = new List<string>(startupConfig);
+
+        string json = JsonUtility.ToJson(data, true);
+        File.WriteAllText(GetFilePath(), json);
+    }
+
+    private void LoadConfigFile()
+    {
+        string path = GetFilePath();
+
+        if (!File.Exists(path))
+            return;
+
+        string json = File.ReadAllText(path);
+        RouterConfigData data = JsonUtility.FromJson<RouterConfigData>(json);
+
+        interfaceConfigs.Clear();
+        startupConfig.Clear();
+
+        if (data == null)
+            return;
+
+        if (data.interfaces != null)
+        {
+            foreach (RouterInterfaceData iface in data.interfaces)
+            {
+                if (!interfaceConfigs.ContainsKey(iface.interfaceName))
+                    interfaceConfigs[iface.interfaceName] = new List<string>();
+
+                if (iface.configLines != null)
+                    interfaceConfigs[iface.interfaceName].AddRange(iface.configLines);
+            }
+        }
+
+        if (data.startupConfig != null)
+        {
+            startupConfig = new List<string>(data.startupConfig);
+        }
+    }
+
+    private string GetFilePath()
+    {
+        return Path.Combine(Application.persistentDataPath, deviceID + "_router.json");
+    }
+
+    private bool IsValidIPv4(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        string[] parts = value.Split('.');
+
+        if (parts.Length != 4)
+            return false;
+
+        foreach (string part in parts)
+        {
+            if (string.IsNullOrWhiteSpace(part))
+                return false;
+
+            if (!int.TryParse(part, out int number))
+                return false;
+
+            if (number < 0 || number > 255)
+                return false;
+
+            if (part.Length > 1 && part.StartsWith("0"))
+                return false;
+        }
+
+        return true;
+    }
+
+    private bool IsValidSubnetMask(string value)
+    {
+        if (!IsValidIPv4(value))
+            return false;
+
+        string[] validMasks =
+        {
+            "128.0.0.0", "192.0.0.0", "224.0.0.0", "240.0.0.0",
+            "248.0.0.0", "252.0.0.0", "254.0.0.0", "255.0.0.0",
+            "255.128.0.0", "255.192.0.0", "255.224.0.0", "255.240.0.0",
+            "255.248.0.0", "255.252.0.0", "255.254.0.0", "255.255.0.0",
+            "255.255.128.0", "255.255.192.0", "255.255.224.0", "255.255.240.0",
+            "255.255.248.0", "255.255.252.0", "255.255.254.0", "255.255.255.0",
+            "255.255.255.128", "255.255.255.192", "255.255.255.224", "255.255.255.240",
+            "255.255.255.248", "255.255.255.252", "255.255.255.254", "255.255.255.255"
+        };
+
+        foreach (string mask in validMasks)
+        {
+            if (value == mask)
+                return true;
+        }
+
+        return false;
+    }
+
     private void AddOutput(string text)
     {
         inputField.text += "\n" + text;
@@ -347,8 +459,6 @@ public class RouterConfig : MonoBehaviour
         PlayerPrefs.SetString(ModeKey, mode);
         PlayerPrefs.SetString(PromptKey, prompt);
         PlayerPrefs.SetString(CurrentInterfaceKey, currentInterface);
-        PlayerPrefs.SetString(RunningConfigKey, SerializeRunningConfig());
-        PlayerPrefs.SetString(StartupConfigKey, string.Join("§", startupConfig));
         PlayerPrefs.Save();
     }
 
@@ -360,50 +470,5 @@ public class RouterConfig : MonoBehaviour
 
         if (inputField != null)
             inputField.text = PlayerPrefs.GetString(SessionTextKey, prompt);
-
-        DeserializeRunningConfig(PlayerPrefs.GetString(RunningConfigKey, ""));
-        string startupRaw = PlayerPrefs.GetString(StartupConfigKey, "");
-        startupConfig = string.IsNullOrEmpty(startupRaw)
-            ? new List<string>()
-            : new List<string>(startupRaw.Split('§'));
-    }
-
-    private string SerializeRunningConfig()
-    {
-        List<string> lines = new List<string>();
-
-        foreach (var kvp in interfaceConfigs)
-        {
-            lines.Add("IFACE|" + kvp.Key);
-            foreach (string line in kvp.Value)
-                lines.Add("LINE|" + line);
-        }
-
-        return string.Join("§", lines);
-    }
-
-    private void DeserializeRunningConfig(string data)
-    {
-        interfaceConfigs.Clear();
-
-        if (string.IsNullOrEmpty(data))
-            return;
-
-        string[] parts = data.Split('§');
-        string currentIface = "";
-
-        foreach (string part in parts)
-        {
-            if (part.StartsWith("IFACE|"))
-            {
-                currentIface = part.Substring(6);
-                if (!interfaceConfigs.ContainsKey(currentIface))
-                    interfaceConfigs[currentIface] = new List<string>();
-            }
-            else if (part.StartsWith("LINE|") && !string.IsNullOrEmpty(currentIface))
-            {
-                interfaceConfigs[currentIface].Add(part.Substring(5));
-            }
-        }
     }
 }

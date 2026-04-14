@@ -8,6 +8,18 @@ public class PCOpener : MonoBehaviour
     public void LoadPCConfig()
     {
         SelectedPC.currentPCID = pcID;
-        SceneManager.LoadScene("PCConfigScene");
+        if (pcID == "Switch")
+        {
+            SceneManager.LoadScene("SwitchConfigScene");    
+        }
+        if (pcID == "PC1" || pcID == "PC2" || pcID == "PC3" || pcID == "PC4")
+        {
+            SceneManager.LoadScene("PCConfigScene");
+        }
+        if (pcID == "Router")
+        {
+            SceneManager.LoadScene("RouterConfigScene");
+        }
+        
     }
 }
