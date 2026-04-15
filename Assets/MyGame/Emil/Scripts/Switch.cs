@@ -8,7 +8,7 @@ public class Switch : MonoBehaviour
 
         int vlan = incomingPort.vlanID;
 
-        // Default VLAN wenn keiner gesetzt
+
         if (vlan == -1)
             vlan = 1;
 
@@ -16,11 +16,11 @@ public class Switch : MonoBehaviour
 
         foreach (Port port in ports)
         {
-            // Nicht zurück zum Eingang
+
             if (port == incomingPort)
                 continue;
 
-            // ❗ VLAN FILTER (nur wenn Port VLAN gesetzt hat)
+
             if (port.vlanID != -1 && port.vlanID != vlan)
                 continue;
 

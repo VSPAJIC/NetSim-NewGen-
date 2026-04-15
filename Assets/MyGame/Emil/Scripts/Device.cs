@@ -25,7 +25,6 @@ public class Device : MonoBehaviour
         ports[0].ReceivePacket(packet);
     }
 
-    // 🔥 NEU
     public void BroadcastPing()
     {
         if (ports.Count == 0)
