@@ -16,16 +16,6 @@ public class RouterConfig : MonoBehaviour
 
     private string deviceID = "Router";
 
-    private const string SessionTextKey = "RouterCLI_SessionText";
-    private const string ModeKey = "RouterCLI_Mode";
-    private const string PromptKey = "RouterCLI_Prompt";
-    private const string CurrentInterfaceKey = "RouterCLI_CurrentInterface";
-
-    private void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
-
     private void Start()
     {
         if (inputField == null)
@@ -34,10 +24,8 @@ public class RouterConfig : MonoBehaviour
         inputField.lineType = TMP_InputField.LineType.MultiLineSubmit;
 
         LoadConfigFile();
-        LoadSession();
 
-        if (string.IsNullOrEmpty(inputField.text))
-            inputField.text = prompt;
+        inputField.text = prompt;
 
         MoveCaretToEnd();
         inputField.ActivateInputField();
@@ -58,16 +46,6 @@ public class RouterConfig : MonoBehaviour
         {
             ProcessCommand();
         }
-    }
-
-    private void OnDisable()
-    {
-        SaveSession();
-    }
-
-    private void OnApplicationQuit()
-    {
-        SaveSession();
     }
 
     private void ProcessCommand()
@@ -93,7 +71,6 @@ public class RouterConfig : MonoBehaviour
         {
             inputField.text += "\n" + prompt;
             MoveCaretToEnd();
-            SaveSession();
             return;
         }
 
@@ -103,7 +80,6 @@ public class RouterConfig : MonoBehaviour
             inputField.text += "\n" + prompt;
 
         MoveCaretToEnd();
-        SaveSession();
     }
 
     private void HandleCommand(string cmd)
@@ -203,7 +179,7 @@ public class RouterConfig : MonoBehaviour
                 return;
             }
 
-            AddOrReplaceInterfaceConfigLine(currentInterface, "encapsulation dot1Q ", " encapsulation dot1Q " + parts[2]);
+            AddOrReplaceInterfaceConfigLine(currentInterface, "encapsulation dot1q ", " encapsulation dot1Q " + parts[2]);
         }
         else if (cmd.StartsWith("ip address ") && (mode == "subinterface" || mode == "interface"))
         {
@@ -269,8 +245,8 @@ public class RouterConfig : MonoBehaviour
 
         for (int i = 0; i < interfaceConfigs[iface].Count; i++)
         {
-            string trimmed = interfaceConfigs[iface][i].TrimStart();
-            if (trimmed.StartsWith(startsWithKey))
+            string trimmed = interfaceConfigs[iface][i].TrimStart().ToLower();
+            if (trimmed.StartsWith(startsWithKey.ToLower()))
             {
                 interfaceConfigs[iface][i] = newLine;
                 return;
@@ -451,24 +427,5 @@ public class RouterConfig : MonoBehaviour
         inputField.selectionAnchorPosition = inputField.text.Length;
         inputField.selectionFocusPosition = inputField.text.Length;
         inputField.ActivateInputField();
-    }
-
-    private void SaveSession()
-    {
-        PlayerPrefs.SetString(SessionTextKey, inputField != null ? inputField.text : "");
-        PlayerPrefs.SetString(ModeKey, mode);
-        PlayerPrefs.SetString(PromptKey, prompt);
-        PlayerPrefs.SetString(CurrentInterfaceKey, currentInterface);
-        PlayerPrefs.Save();
-    }
-
-    private void LoadSession()
-    {
-        mode = PlayerPrefs.GetString(ModeKey, "user");
-        prompt = PlayerPrefs.GetString(PromptKey, "Router> ");
-        currentInterface = PlayerPrefs.GetString(CurrentInterfaceKey, "");
-
-        if (inputField != null)
-            inputField.text = PlayerPrefs.GetString(SessionTextKey, prompt);
     }
 }
