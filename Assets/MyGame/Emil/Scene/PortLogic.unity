@@ -154,6 +154,8 @@ MonoBehaviour:
   parentDevice: {fileID: 537540267}
   connectedPort: {fileID: 0}
   vlanID: 1
+  ipAddress: 
+  subnetMask: 
 --- !u!65 &143116294
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -278,6 +280,8 @@ MonoBehaviour:
   parentDevice: {fileID: 1868924335}
   connectedPort: {fileID: 0}
   vlanID: 1
+  ipAddress: 192.168.1.1
+  subnetMask: 255.255.0.0
 --- !u!65 &315408163
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -402,6 +406,8 @@ MonoBehaviour:
   parentDevice: {fileID: 1868924335}
   connectedPort: {fileID: 0}
   vlanID: 1
+  ipAddress: 
+  subnetMask: 
 --- !u!65 &369179824
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -819,8 +825,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 792c7c65b00ef04428c6b9470f98f86a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sourceDevice: {fileID: 537540267}
-  targetDevice: {fileID: 1193620034}
+  sourceDevice: {fileID: 1771195518}
+  targetDevice: {fileID: 1868924335}
 --- !u!1 &963942413
 GameObject:
   m_ObjectHideFlags: 0
@@ -977,6 +983,8 @@ MonoBehaviour:
   parentDevice: {fileID: 1771195518}
   connectedPort: {fileID: 0}
   vlanID: 1
+  ipAddress: 192.168.1.2
+  subnetMask: 25.255.0.0
 --- !u!65 &1069367793
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1226,6 +1234,8 @@ MonoBehaviour:
   parentDevice: {fileID: 1319732671}
   connectedPort: {fileID: 0}
   vlanID: 1
+  ipAddress: 
+  subnetMask: 
 --- !u!65 &1265437560
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1350,6 +1360,8 @@ MonoBehaviour:
   parentDevice: {fileID: 1319732671}
   connectedPort: {fileID: 0}
   vlanID: 1
+  ipAddress: 
+  subnetMask: 
 --- !u!65 &1267962017
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1723,6 +1735,8 @@ MonoBehaviour:
   parentDevice: {fileID: 1193620034}
   connectedPort: {fileID: 0}
   vlanID: 1
+  ipAddress: 
+  subnetMask: 
 --- !u!65 &1362281432
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1987,6 +2001,8 @@ MonoBehaviour:
   parentDevice: {fileID: 1319732671}
   connectedPort: {fileID: 0}
   vlanID: 2
+  ipAddress: 
+  subnetMask: 
 --- !u!65 &1853777931
 BoxCollider:
   m_ObjectHideFlags: 0
