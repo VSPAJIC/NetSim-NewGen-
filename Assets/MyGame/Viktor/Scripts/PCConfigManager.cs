@@ -26,6 +26,8 @@ public class PCConfigManager : MonoBehaviour
 
         LoadConfig();
         ClearError();
+
+        Debug.Log("Speicherordner: " + Application.persistentDataPath);
     }
 
     public void SaveConfig()
@@ -43,31 +45,19 @@ public class PCConfigManager : MonoBehaviour
         string errorMessage = "";
 
         if (string.IsNullOrEmpty(ip))
-        {
             errorMessage += "IP-Adresse fehlt.\n";
-        }
         else if (!IsValidIPv4(ip))
-        {
             errorMessage += "Ungültige IP-Adresse.\n";
-        }
 
         if (string.IsNullOrEmpty(subnet))
-        {
             errorMessage += "Subnet-Mask fehlt.\n";
-        }
         else if (!IsValidSubnetMask(subnet))
-        {
             errorMessage += "Ungültige Subnet-Mask.\n";
-        }
 
         if (string.IsNullOrEmpty(gateway))
-        {
             errorMessage += "Gateway fehlt.\n";
-        }
         else if (!IsValidIPv4(gateway))
-        {
             errorMessage += "Ungültiges Gateway.\n";
-        }
 
         if (!string.IsNullOrEmpty(errorMessage))
         {
@@ -83,10 +73,12 @@ public class PCConfigManager : MonoBehaviour
         };
 
         string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(GetFilePath(), json);
+        string path = GetFilePath();
+
+        File.WriteAllText(path, json);
 
         ClearError();
-        Debug.Log("Gespeichert für " + currentPCID);
+        Debug.Log($"Gespeichert für {currentPCID}\nDatei: {path}");
     }
 
     public void LoadConfig()
@@ -101,12 +93,16 @@ public class PCConfigManager : MonoBehaviour
             ipInput.text = data.ipAddress;
             subnetInput.text = data.subnetMask;
             gatewayInput.text = data.gateway;
+
+            Debug.Log($"Geladen für {currentPCID}\nDatei: {path}");
         }
         else
         {
             ipInput.text = "";
             subnetInput.text = "";
             gatewayInput.text = "";
+
+            Debug.Log($"Noch keine Datei gefunden für {currentPCID}\nErwartet: {path}");
         }
     }
 
@@ -150,7 +146,6 @@ public class PCConfigManager : MonoBehaviour
             if (number < 0 || number > 255)
                 return false;
 
-            // Keine führenden Nullen wie 001
             if (part.Length > 1 && part.StartsWith("0"))
                 return false;
         }
@@ -216,15 +211,11 @@ public class PCConfigManager : MonoBehaviour
         foreach (char c in oldText)
         {
             if (char.IsDigit(c) || c == '.')
-            {
                 newText += c;
-            }
         }
 
         if (oldText != newText)
-        {
             inputField.text = newText;
-        }
 
         ClearError();
     }

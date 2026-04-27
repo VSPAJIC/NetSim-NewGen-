@@ -320,7 +320,12 @@ public class RouterConfig : MonoBehaviour
         data.startupConfig = new List<string>(startupConfig);
 
         string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(GetFilePath(), json);
+        string path = GetFilePath();
+
+        File.WriteAllText(path, json);
+
+
+        Debug.Log($"Router gespeichert!\nPfad: {path}");
     }
 
     private void LoadConfigFile()

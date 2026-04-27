@@ -202,7 +202,7 @@ public class SwitchConfig : MonoBehaviour
         }
     }
 
-    // 💾 SPEICHERN
+
     private void SaveConfig()
     {
         SwitchConfigData data = new SwitchConfigData();
@@ -225,7 +225,11 @@ public class SwitchConfig : MonoBehaviour
         }
 
         string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(GetFilePath(), json);
+        string path = GetFilePath();
+
+        File.WriteAllText(path, json);
+
+        Debug.Log($"Switch gespeichert!\nDatei: {path}");
     }
 
     // 📂 LADEN
@@ -234,7 +238,10 @@ public class SwitchConfig : MonoBehaviour
         string path = GetFilePath();
 
         if (!File.Exists(path))
+        {
+            Debug.Log($"Noch keine Switch-Datei gefunden.\nErwartet: {path}");
             return;
+        }
 
         string json = File.ReadAllText(path);
         SwitchConfigData data = JsonUtility.FromJson<SwitchConfigData>(json);
@@ -242,20 +249,29 @@ public class SwitchConfig : MonoBehaviour
         vlans.Clear();
         interfaceVlan.Clear();
 
-        foreach (var vlan in data.vlans)
+        if (data.vlans != null)
         {
-            vlans[vlan.vlanId] = new List<string>();
+            foreach (var vlan in data.vlans)
+            {
+                vlans[vlan.vlanId] = new List<string>();
+            }
         }
 
-        foreach (var iface in data.interfaceVlans)
+        if (data.interfaceVlans != null)
         {
-            interfaceVlan[iface.interfaceName] = iface.vlanId;
+            foreach (var iface in data.interfaceVlans)
+            {
+                interfaceVlan[iface.interfaceName] = iface.vlanId;
 
-            if (!vlans.ContainsKey(iface.vlanId))
-                vlans[iface.vlanId] = new List<string>();
+                if (!vlans.ContainsKey(iface.vlanId))
+                    vlans[iface.vlanId] = new List<string>();
 
-            vlans[iface.vlanId].Add(iface.interfaceName);
+                if (!vlans[iface.vlanId].Contains(iface.interfaceName))
+                    vlans[iface.vlanId].Add(iface.interfaceName);
+            }
         }
+
+        Debug.Log($"Switch geladen!\nDatei: {path}");
     }
 
     private string GetFilePath()
