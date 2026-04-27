@@ -8,7 +8,6 @@ public class Switch : MonoBehaviour
 
         int vlan = incomingPort.vlanID;
 
-
         if (vlan == -1)
             vlan = 1;
 
@@ -16,11 +15,10 @@ public class Switch : MonoBehaviour
 
         foreach (Port port in ports)
         {
-
             if (port == incomingPort)
                 continue;
 
-
+            // ❗ VLAN FILTER
             if (port.vlanID != -1 && port.vlanID != vlan)
                 continue;
 

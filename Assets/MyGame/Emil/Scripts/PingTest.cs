@@ -7,7 +7,6 @@ public class PingTest : MonoBehaviour
 
     void Update()
     {
-
         if (Input.GetKeyDown(KeyCode.P))
         {
             if (sourceDevice == null || targetDevice == null)
@@ -16,10 +15,8 @@ public class PingTest : MonoBehaviour
                 return;
             }
 
-            Debug.Log($"📡 {sourceDevice.deviceName} startet Ping zu {targetDevice.deviceName}");
             sourceDevice.Ping(targetDevice);
         }
-
 
         if (Input.GetKeyDown(KeyCode.B))
         {
