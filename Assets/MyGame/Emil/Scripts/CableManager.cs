@@ -5,6 +5,8 @@ public class CableManager : MonoBehaviour
     public Camera cam;
     public GameObject cablePrefab;
 
+    public int raycastDistance = 100;
+
     private Cable currentCable;
     private bool isPlacingCable = false;
 
@@ -21,7 +23,7 @@ public class CableManager : MonoBehaviour
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        if (!Physics.Raycast(ray, out hit)) return;
+        if (!Physics.Raycast(ray, out hit, raycastDistance)) return;
 
         GameObject obj = hit.collider.gameObject;
 
