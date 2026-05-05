@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(LineRenderer))]
 public class Cable : MonoBehaviour
 {
     public static int cableCounter = 0;
@@ -13,25 +12,22 @@ public class Cable : MonoBehaviour
     public GameObject portB;
 
     private List<Transform> points = new List<Transform>();
-    private LineRenderer line;
+    private List<GameObject> ropeObjects = new List<GameObject>();
 
     void Awake()
     {
         cableID = ++cableCounter;
         cableName = "Cable_" + cableID;
         gameObject.name = cableName;
-
-        line = GetComponent<LineRenderer>();
-        line.useWorldSpace = true;
     }
 
-    void LateUpdate()
+    public List<Transform> GetPoints()
     {
-        DrawCable();
+        return points;
     }
 
     // ===============================
-    // START PORT
+    // START
     // ===============================
     public void SetPortA(GameObject startPort)
     {
@@ -44,72 +40,83 @@ public class Cable : MonoBehaviour
     // ===============================
     public void AddWaypoint(GameObject waypoint)
     {
-        CreateSegment(points[points.Count - 1].gameObject, waypoint);
+        Transform last = points[points.Count - 1];
+
+        CreateLogicalSegment(last.gameObject, waypoint);
+        CreateRopeSegment(last, waypoint.transform);
+
         points.Add(waypoint.transform);
     }
 
     // ===============================
-    // END PORT
+    // END
     // ===============================
     public void SetPortB(GameObject endPort)
     {
+        Transform last = points[points.Count - 1];
+
         portB = endPort;
 
-        CreateSegment(points[points.Count - 1].gameObject, endPort);
+        CreateLogicalSegment(last.gameObject, endPort);
+        CreateRopeSegment(last, endPort.transform);
+
         points.Add(endPort.transform);
 
         ConnectPorts();
     }
 
     // ===============================
-    // LOGISCHE VERBINDUNG
+    // LOGIK
     // ===============================
     void ConnectPorts()
     {
-        Port portAScript = portA.GetComponent<Port>();
-        Port portBScript = portB.GetComponent<Port>();
+        Port a = portA.GetComponent<Port>();
+        Port b = portB.GetComponent<Port>();
 
-        if (portAScript != null && portBScript != null)
+        if (a != null && b != null)
         {
-            portAScript.ConnectTo(portBScript);
-            Debug.Log($"{portAScript.name} <--> {portBScript.name}");
-        }
-        else
-        {
-            Debug.LogWarning("Einer der Ports hat kein Port-Script!");
+            a.ConnectTo(b);
+            Debug.Log($"{a.name} <--> {b.name}");
         }
     }
 
     // ===============================
-    // SEGMENT ERSTELLUNG
+    // LOG SEGMENT
     // ===============================
-    void CreateSegment(GameObject from, GameObject to)
+    void CreateLogicalSegment(GameObject from, GameObject to)
     {
-        int segmentIndex = transform.childCount;
-
-        GameObject segmentObj = new GameObject(
-            "Segment_" + segmentIndex +
-            " (" + from.name + " → " + to.name + ")"
+        GameObject seg = new GameObject(
+            $"Segment ({from.name} → {to.name})"
         );
 
-        segmentObj.transform.parent = transform;
+        seg.transform.parent = transform;
 
-        CableSegment segment = segmentObj.AddComponent<CableSegment>();
-        segment.Setup(from, to);
+        CableSegment cs = seg.AddComponent<CableSegment>();
+        cs.Setup(from, to);
     }
 
     // ===============================
-    // LINE RENDERER
+    // ROPE SEGMENT (LIVE)
     // ===============================
-    void DrawCable()
+    void CreateRopeSegment(Transform from, Transform to)
     {
-        if (points.Count < 2) return;
+        GameObject ropeObj = new GameObject("RopeSegment");
+        ropeObj.transform.parent = transform;
 
-        line.positionCount = points.Count;
+        LineRenderer lr = ropeObj.AddComponent<LineRenderer>();
+        lr.startWidth = 0.03f;
+        lr.endWidth = 0.03f;
 
-        for (int i = 0; i < points.Count; i++)
-        {
-            line.SetPosition(i, points[i].position);
-        }
+        CableRope rope = ropeObj.AddComponent<CableRope>();
+
+        float dist = Vector3.Distance(from.position, to.position);
+        rope.ropeLength = dist;
+
+        // 🔥 WICHTIG: Ground Layer setzen
+        rope.groundLayer = LayerMask.GetMask("Ground");
+
+        rope.Init(from, to);
+
+        ropeObjects.Add(ropeObj);
     }
 }

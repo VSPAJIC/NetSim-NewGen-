@@ -292,7 +292,7 @@ GameObject:
   - component: {fileID: 520251948}
   - component: {fileID: 520251947}
   - component: {fileID: 520251946}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -673,6 +673,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: SWITCH
       objectReference: {fileID: 0}
+    - target: {fileID: 2125472105819639874, guid: ba33fced7bef3b4459501f598626bc6d, type: 3}
+      propertyPath: ipAddress
+      value: 10.10.10.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4967983497712201222, guid: ba33fced7bef3b4459501f598626bc6d, type: 3}
+      propertyPath: ipAddress
+      value: 10.10.10.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4967983497712201222, guid: ba33fced7bef3b4459501f598626bc6d, type: 3}
+      propertyPath: subnetMask
+      value: 255.255.255.0
+      objectReference: {fileID: 0}
     - target: {fileID: 5025497407688523421, guid: ba33fced7bef3b4459501f598626bc6d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.8
@@ -713,6 +725,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8271958830147285288, guid: ba33fced7bef3b4459501f598626bc6d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 57bb11c15581f08499f9d9f044d58367, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -846,7 +862,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6242181611920181308, guid: 243f79bdc17ac4740962a32242ce786c, type: 3}
       propertyPath: ipAddress
-      value: 10.20.10.1
+      value: 10.10.10.1
       objectReference: {fileID: 0}
     - target: {fileID: 6242181611920181308, guid: 243f79bdc17ac4740962a32242ce786c, type: 3}
       propertyPath: subnetMask

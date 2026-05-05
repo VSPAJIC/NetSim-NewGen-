@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 2610104313586410113}
   - component: {fileID: 8915283694318028358}
   - component: {fileID: 347812997459794021}
+  - component: {fileID: -4460053828294358557}
+  - component: {fileID: -3387981893542769514}
   m_Layer: 0
   m_Name: Cable
   m_TagString: Untagged
@@ -156,3 +158,48 @@ MonoBehaviour:
   cableName: 
   portA: {fileID: 0}
   portB: {fileID: 0}
+--- !u!114 &-4460053828294358557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3053721537886881550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5961558cebaee1e418ec39565fafddc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startPoint: {fileID: 0}
+  endPoint: {fileID: 0}
+  segmentCount: 20
+  ropeLength: 10
+  gravity: -2
+  iterations: 8
+  damping: 0.98
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  groundOffset: 0.02
+--- !u!64 &-3387981893542769514
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3053721537886881550}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
