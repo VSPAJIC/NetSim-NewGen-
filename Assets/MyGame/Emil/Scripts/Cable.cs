@@ -11,6 +11,10 @@ public class Cable : MonoBehaviour
     public GameObject portA;
     public GameObject portB;
 
+    // 🔥 Durchhang einstellen (1.0 = kein Durchhang)
+    [Range(1.0f, 2.0f)]
+    public float slackMultiplier = 1.3f;
+
     private List<Transform> points = new List<Transform>();
     private List<GameObject> ropeObjects = new List<GameObject>();
 
@@ -78,10 +82,14 @@ public class Cable : MonoBehaviour
             a.ConnectTo(b);
             Debug.Log($"{a.name} <--> {b.name}");
         }
+        else
+        {
+            Debug.LogWarning("Port Script fehlt!");
+        }
     }
 
     // ===============================
-    // LOG SEGMENT
+    // LOG SEGMENT (nur Info)
     // ===============================
     void CreateLogicalSegment(GameObject from, GameObject to)
     {
@@ -96,7 +104,7 @@ public class Cable : MonoBehaviour
     }
 
     // ===============================
-    // ROPE SEGMENT (LIVE)
+    // 🔥 ROPE SEGMENT (MIT DURCHHANG)
     // ===============================
     void CreateRopeSegment(Transform from, Transform to)
     {
@@ -110,9 +118,11 @@ public class Cable : MonoBehaviour
         CableRope rope = ropeObj.AddComponent<CableRope>();
 
         float dist = Vector3.Distance(from.position, to.position);
-        rope.ropeLength = dist;
 
-        // 🔥 WICHTIG: Ground Layer setzen
+        // 🔥 HIER passiert der Durchhang
+        rope.ropeLength = dist * slackMultiplier;
+
+        // Ground Layer setzen (WICHTIG)
         rope.groundLayer = LayerMask.GetMask("Ground");
 
         rope.Init(from, to);

@@ -7,7 +7,7 @@ public class CableRope : MonoBehaviour
     public Transform startPoint;
     public Transform endPoint;
 
-    public int segmentCount = 20;
+    public int segmentCount = 10;
     public float ropeLength = 5f;
 
     public float gravity = -1.2f;

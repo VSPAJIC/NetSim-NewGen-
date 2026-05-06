@@ -203,7 +203,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7791168285203797673, guid: 7af40d5a66dddfd46b1ef8fc787143f5, type: 3}
   m_PrefabInstance: {fileID: 8587818003374414570}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 8587818003374414571}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e55b94fe934f2c14aa00aa2cba862ef8, type: 3}
@@ -974,12 +974,16 @@ PrefabInstance:
       value: PC1
       objectReference: {fileID: 0}
     - target: {fileID: 5471669706202950362, guid: 7af40d5a66dddfd46b1ef8fc787143f5, type: 3}
+      propertyPath: vlanID
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5471669706202950362, guid: 7af40d5a66dddfd46b1ef8fc787143f5, type: 3}
       propertyPath: ipAddress
-      value: 10.10.10.10
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5471669706202950362, guid: 7af40d5a66dddfd46b1ef8fc787143f5, type: 3}
       propertyPath: subnetMask
-      value: 255.255.255.0
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8656583859561025319, guid: 7af40d5a66dddfd46b1ef8fc787143f5, type: 3}
       propertyPath: m_IsTrigger
@@ -988,8 +992,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2356651207740698673, guid: 7af40d5a66dddfd46b1ef8fc787143f5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8587818003374414572}
   m_SourcePrefab: {fileID: 100100000, guid: 7af40d5a66dddfd46b1ef8fc787143f5, type: 3}
+--- !u!1 &8587818003374414571 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2356651207740698673, guid: 7af40d5a66dddfd46b1ef8fc787143f5, type: 3}
+  m_PrefabInstance: {fileID: 8587818003374414570}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8587818003374414572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8587818003374414571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 432bd4d358952274fbea0d7b28b912ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pcID: PC1
 --- !u!1001 &9116370441056529946
 PrefabInstance:
   m_ObjectHideFlags: 0

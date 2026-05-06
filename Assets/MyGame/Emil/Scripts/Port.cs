@@ -9,6 +9,7 @@ public class Port : MonoBehaviour
 
     public string ipAddress = "";      // 🔥 leer = keine IP
     public string subnetMask = "";     // 🔥 leer = kein Subnetz
+    public string gateway = "";        // 🔥 optional, nur für PCs
 
     void Awake()
     {
