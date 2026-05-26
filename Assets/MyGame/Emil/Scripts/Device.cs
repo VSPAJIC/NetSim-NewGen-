@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Device : MonoBehaviour
 {
     public string deviceName;
@@ -8,6 +9,12 @@ public class Device : MonoBehaviour
 
     public void Ping(Device target)
     {
+        if (target == null)
+        {
+            Debug.LogError("Ping-Ziel ist null!");
+            return;
+        }
+
         if (ports.Count == 0)
         {
             Debug.Log("Keine Ports vorhanden!");

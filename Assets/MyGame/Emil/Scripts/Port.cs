@@ -68,6 +68,12 @@ public class Port : MonoBehaviour
                 return;
             }
 
+            if (string.IsNullOrEmpty(subnetMask))
+            {
+                Debug.Log($"❌ {name} hat keine Subnetzmaske!");
+                return;
+            }
+
             bool sameNet = NetworkHelper.SameNetwork(
                 this.ipAddress,
                 connectedPort.ipAddress,
