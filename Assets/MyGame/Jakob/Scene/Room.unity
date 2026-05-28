@@ -12711,7 +12711,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deviceName: PC2
   ports:
-  - {fileID: 0}
+  - {fileID: 397403458}
 --- !u!114 &1297321128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15326,7 +15326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 432bd4d358952274fbea0d7b28b912ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pcID: 3
+  pcID: PC3
 --- !u!1 &1480120053
 GameObject:
   m_ObjectHideFlags: 0
