@@ -158,6 +158,7 @@ MonoBehaviour:
   cableName: 
   portA: {fileID: 0}
   portB: {fileID: 0}
+  slackMultiplier: 1.3
 --- !u!114 &-4460053828294358557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,12 +175,12 @@ MonoBehaviour:
   endPoint: {fileID: 0}
   segmentCount: 20
   ropeLength: 10
-  gravity: -2
+  gravity: 2
   iterations: 8
   damping: 0.98
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   groundOffset: 0.02
 --- !u!64 &-3387981893542769514
 MeshCollider:

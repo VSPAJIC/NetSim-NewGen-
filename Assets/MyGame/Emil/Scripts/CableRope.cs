@@ -7,20 +7,16 @@ public class CableRope : MonoBehaviour
     public Transform startPoint;
     public Transform endPoint;
 
-    public int segmentCount = 10;
+    [Header("Cable Settings")]
+    public int segmentCount = 20;
     public float ropeLength = 5f;
 
-    public float gravity = -1.2f;
-    public int iterations = 15;
-    public float damping = 0.92f;
-
+    [Header("Ground Collision")]
     public LayerMask groundLayer;
-    public float groundOffset = 0.02f;
+    public float groundOffset = 0.01f;
 
     private LineRenderer line;
-
     private List<Vector3> points = new List<Vector3>();
-    private List<Vector3> oldPoints = new List<Vector3>();
 
     private bool initialized = false;
 
@@ -32,94 +28,90 @@ public class CableRope : MonoBehaviour
         line = GetComponent<LineRenderer>();
 
         line.positionCount = segmentCount;
+        line.useWorldSpace = true;
         line.startWidth = 0.03f;
         line.endWidth = 0.03f;
 
-        InitRope();
+        GenerateCable();
 
         initialized = true;
     }
 
-    void InitRope()
+    void GenerateCable()
     {
         points.Clear();
-        oldPoints.Clear();
-
-        Vector3 start = startPoint.position;
 
         for (int i = 0; i < segmentCount; i++)
         {
-            Vector3 pos = start + Vector3.down * (ropeLength * (i / (float)segmentCount));
+            float t = i / (float)(segmentCount - 1);
+
+            Vector3 pos = Vector3.Lerp(
+                startPoint.position,
+                endPoint.position,
+                t
+            );
+
             points.Add(pos);
-            oldPoints.Add(pos);
         }
-    }
 
-    void Update()
-    {
-        if (!initialized || startPoint == null || endPoint == null)
-            return;
-
-        Simulate();
-        ApplyConstraints();
+        ApplySag();
         HandleCollision();
         Draw();
     }
 
-    void Simulate()
+    void Update()
     {
-        for (int i = 0; i < points.Count; i++)
-        {
-            Vector3 velocity = (points[i] - oldPoints[i]) * damping;
-            oldPoints[i] = points[i];
+        if (!initialized)
+            return;
 
-            points[i] += velocity;
-            points[i] += Vector3.up * gravity * Time.deltaTime * Time.deltaTime;
-        }
+        if (startPoint == null || endPoint == null)
+            return;
+
+        GenerateCable();
     }
 
-    void ApplyConstraints()
+    void ApplySag()
     {
-        float segmentLength = ropeLength / segmentCount;
+        float directDistance =
+            Vector3.Distance(startPoint.position, endPoint.position);
 
-        for (int j = 0; j < iterations; j++)
+        float extraLength =
+            Mathf.Max(0, ropeLength - directDistance);
+
+        for (int i = 1; i < points.Count - 1; i++)
         {
-            points[0] = startPoint.position;
-            points[points.Count - 1] = endPoint.position;
+            float t = i / (float)(points.Count - 1);
 
-            for (int i = 0; i < points.Count - 1; i++)
-            {
-                Vector3 dir = points[i + 1] - points[i];
-                float dist = dir.magnitude;
-                float error = dist - segmentLength;
+            float sag =
+                Mathf.Sin(t * Mathf.PI) *
+                extraLength *
+                0.5f;
 
-                Vector3 change = dir.normalized * error;
-
-                if (i != 0)
-                    points[i] += change * 0.5f;
-
-                if (i != points.Count - 2)
-                    points[i + 1] -= change * 0.5f;
-            }
+            points[i] += Vector3.down * sag;
         }
     }
 
     void HandleCollision()
     {
-        for (int i = 0; i < points.Count; i++)
+        for (int i = 1; i < points.Count - 1; i++)
         {
-            Ray ray = new Ray(points[i], Vector3.down);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, 0.5f, groundLayer))
+            if (Physics.Raycast(
+                points[i] + Vector3.up,
+                Vector3.down,
+                out hit,
+                5f,
+                groundLayer))
             {
-                float minY = hit.point.y + groundOffset;
+                float groundY =
+                    hit.point.y + groundOffset;
 
-                if (points[i].y < minY)
+                if (points[i].y < groundY)
                 {
                     points[i] = new Vector3(
                         points[i].x,
-                        minY,
+                        groundY,
                         points[i].z
                     );
                 }
@@ -129,6 +121,8 @@ public class CableRope : MonoBehaviour
 
     void Draw()
     {
+        line.positionCount = points.Count;
+
         for (int i = 0; i < points.Count; i++)
         {
             line.SetPosition(i, points[i]);
