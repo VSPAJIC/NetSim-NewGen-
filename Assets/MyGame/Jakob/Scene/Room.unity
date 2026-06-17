@@ -24162,7 +24162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d60ba664a0bc0264da8f50566a5f240f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  switchID: Switch
+  switchID: Switch2
 --- !u!1 &7712416930596566009
 GameObject:
   m_ObjectHideFlags: 0
@@ -24176,6 +24176,7 @@ GameObject:
   - component: {fileID: 2687602037902455106}
   - component: {fileID: 7712416930596566011}
   - component: {fileID: 7712416930596566010}
+  - component: {fileID: 7712416930596566012}
   m_Layer: 0
   m_Name: SwitchRoom2
   m_TagString: Untagged
@@ -24207,7 +24208,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d60ba664a0bc0264da8f50566a5f240f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  switchID: Switch
+  switchID: Switch1
+--- !u!114 &7712416930596566012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7712416930596566009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 746b6fd577863bc488dc126a605360d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8018804950102825711
 Transform:
   m_ObjectHideFlags: 0

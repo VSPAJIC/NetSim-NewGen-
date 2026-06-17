@@ -1006,6 +1006,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputField: {fileID: 1388831076}
+  deviceID: Switch1
 --- !u!1 &1460092941
 GameObject:
   m_ObjectHideFlags: 0

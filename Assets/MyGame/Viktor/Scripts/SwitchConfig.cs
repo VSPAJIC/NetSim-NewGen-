@@ -14,10 +14,14 @@ public class SwitchConfig : MonoBehaviour
     private Dictionary<int, List<string>> vlans = new Dictionary<int, List<string>>();
     private Dictionary<string, int> interfaceVlan = new Dictionary<string, int>();
 
-    private string deviceID = "Switch";
+    private string deviceID;
 
     private void Start()
     {
+        deviceID = !string.IsNullOrEmpty(SwitchConfigSelection.SelectedSwitchID)
+            ? SwitchConfigSelection.SelectedSwitchID
+            : gameObject.name;
+
         LoadConfig();
 
         inputField.lineType = TMP_InputField.LineType.MultiLineSubmit;
@@ -224,30 +228,21 @@ public class SwitchConfig : MonoBehaviour
             });
         }
 
-        string json = JsonUtility.ToJson(data, true);
-        string path = GetFilePath();
-
-        File.WriteAllText(path, json);
-
-        Debug.Log($"Switch gespeichert!\nDatei: {path}");
+        var storage = new SwitchConfigStorage(deviceID);
+        storage.SaveData(data);
     }
 
     // 📂 LADEN
     private void LoadConfig()
     {
-        string path = GetFilePath();
-
-        if (!File.Exists(path))
-        {
-            Debug.Log($"Noch keine Switch-Datei gefunden.\nErwartet: {path}");
-            return;
-        }
-
-        string json = File.ReadAllText(path);
-        SwitchConfigData data = JsonUtility.FromJson<SwitchConfigData>(json);
+        var storage = new SwitchConfigStorage(deviceID);
+        SwitchConfigData data = storage.LoadData();
 
         vlans.Clear();
         interfaceVlan.Clear();
+
+        if (data == null)
+            return;
 
         if (data.vlans != null)
         {
@@ -270,13 +265,6 @@ public class SwitchConfig : MonoBehaviour
                     vlans[iface.vlanId].Add(iface.interfaceName);
             }
         }
-
-        Debug.Log($"Switch geladen!\nDatei: {path}");
-    }
-
-    private string GetFilePath()
-    {
-        return Path.Combine(Application.persistentDataPath, deviceID + "_switch.json");
     }
 
     private void AddOutput(string text)
