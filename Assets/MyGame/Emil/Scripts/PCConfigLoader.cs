@@ -3,7 +3,13 @@ using System.IO;
 
 public class PCConfigLoader : MonoBehaviour
 {
+    [Header("PC Config")]
+    [Tooltip("PC ID für das Laden der Konfiguration aus dem persistenten Speicher.")]
     public string pcID; // z.B. "PC1"
+
+    [Header("Inspector Overrides")]
+    [Tooltip("Wenn aktiviert, werden IP/Gateway/Subnet aus dem Inspector verwendet und die JSON-Konfiguration ignoriert.")]
+    public bool useInspectorConfig = false;
 
     void Start()
     {
@@ -16,6 +22,12 @@ public class PCConfigLoader : MonoBehaviour
 
     public void LoadConfig()
     {
+        if (useInspectorConfig)
+        {
+            Debug.Log("🛠️ Inspector-Konfiguration für PC wird verwendet.");
+            return;
+        }
+
         if (string.IsNullOrEmpty(pcID))
         {
             Debug.LogError("❌ Keine PC ID gesetzt!");

@@ -3,7 +3,11 @@ using System.IO;
 
 public class SwitchConfigLoader : MonoBehaviour
 {
+    [Header("Switch Config")]
     public string switchID = "Switch";
+
+    [Header("Inspector Overrides")]
+    public bool useInspectorVLANs = false;
 
     void Start()
     {
@@ -12,17 +16,26 @@ public class SwitchConfigLoader : MonoBehaviour
 
     public void LoadConfig()
     {
+        if (useInspectorVLANs)
+        {
+            Debug.Log("🛠️ Nutze Inspector-Werte für " + switchID);
+            ApplyInspectorVLANs();
+            return;
+        }
+
         string path = Path.Combine(Application.persistentDataPath, switchID + "_switch.json");
 
         Debug.Log("📂 Lade Switch Config: " + path);
 
         if (!File.Exists(path))
         {
-            Debug.LogWarning("⚠️ Keine Switch Config gefunden!");
+            Debug.LogWarning("⚠️ Keine Switch Config gefunden: " + path);
             return;
         }
 
         string json = File.ReadAllText(path);
+        Debug.Log("📄 JSON Inhalt:\n" + json);
+
         SwitchConfigData data = JsonUtility.FromJson<SwitchConfigData>(json);
 
         if (data == null)
@@ -34,30 +47,61 @@ public class SwitchConfigLoader : MonoBehaviour
         ApplyConfig(data);
     }
 
-    void ApplyConfig(SwitchConfigData data)
+    private void ApplyInspectorVLANs()
     {
-        Port[] ports = GetComponentsInChildren<Port>();
+        Port[] ports = GetComponentsInChildren<Port>(true);
 
-        if (ports.Length == 0)
+        foreach (Port port in ports)
         {
-            Debug.LogError("❌ Keine Ports am Switch gefunden!");
+            int vlan = port.vlanID == -1 ? 1 : port.vlanID;
+            Debug.Log($"🏷️ Inspector: {port.interfaceName} VLAN {vlan}, Trunk = {port.isTrunk}");
+        }
+    }
+
+    private void ApplyConfig(SwitchConfigData data)
+    {
+        Port[] ports = GetComponentsInChildren<Port>(true);
+
+        Debug.Log("🔎 Ports am Switch gefunden: " + ports.Length);
+
+        foreach (Port port in ports)
+        {
+            Debug.Log($"➡️ Switch-Port gefunden: {port.interfaceName}");
+            port.vlanID = 1;
+            port.isTrunk = false;
+        }
+
+        if (data.interfaceVlans == null || data.interfaceVlans.Count == 0)
+        {
+            Debug.LogWarning("⚠️ Keine Interface-Konfigurationen in JSON.");
             return;
         }
 
-        // 🔷 VLAN Zuweisung auf Ports anwenden
-        foreach (var iface in data.interfaceVlans)
+        foreach (InterfaceVlanData iface in data.interfaceVlans)
         {
+            bool found = false;
+
+            Debug.Log($"📌 JSON Interface: {iface.interfaceName} VLAN {iface.vlanId}, Trunk={iface.isTrunk}");
+
             foreach (Port port in ports)
             {
-                if (port.name.ToLower() == iface.interfaceName.ToLower())
+                if (port.interfaceName.Trim().ToLower() == iface.interfaceName.Trim().ToLower())
                 {
                     port.vlanID = iface.vlanId;
+                    port.isTrunk = iface.isTrunk;
 
-                    Debug.Log($"🏷️ {port.name} → VLAN {iface.vlanId}");
+                    found = true;
+
+                    Debug.Log($"✅ ANGEWENDET: {port.interfaceName} → VLAN {port.vlanID}, Trunk={port.isTrunk}");
                 }
+            }
+
+            if (!found)
+            {
+                Debug.LogWarning($"⚠️ Kein Port mit Interface Name '{iface.interfaceName}' gefunden!");
             }
         }
 
-        Debug.Log("✅ Switch Config angewendet!");
+        Debug.Log("✅ Switch Config angewendet: " + switchID);
     }
 }

@@ -11,7 +11,6 @@ public class Cable : MonoBehaviour
     public GameObject portA;
     public GameObject portB;
 
-    // 🔥 Durchhang einstellen (1.0 = kein Durchhang)
     [Range(1.0f, 2.0f)]
     public float slackMultiplier = 1.3f;
 
@@ -30,18 +29,12 @@ public class Cable : MonoBehaviour
         return points;
     }
 
-    // ===============================
-    // START
-    // ===============================
     public void SetPortA(GameObject startPort)
     {
         portA = startPort;
         points.Add(startPort.transform);
     }
 
-    // ===============================
-    // WAYPOINT
-    // ===============================
     public void AddWaypoint(GameObject waypoint)
     {
         Transform last = points[points.Count - 1];
@@ -52,9 +45,6 @@ public class Cable : MonoBehaviour
         points.Add(waypoint.transform);
     }
 
-    // ===============================
-    // END
-    // ===============================
     public void SetPortB(GameObject endPort)
     {
         Transform last = points[points.Count - 1];
@@ -69,9 +59,6 @@ public class Cable : MonoBehaviour
         ConnectPorts();
     }
 
-    // ===============================
-    // LOGIK
-    // ===============================
     void ConnectPorts()
     {
         Port a = portA.GetComponent<Port>();
@@ -80,7 +67,7 @@ public class Cable : MonoBehaviour
         if (a != null && b != null)
         {
             a.ConnectTo(b);
-            Debug.Log($"{a.name} <--> {b.name}");
+            Debug.Log($"{a.interfaceName} <--> {b.interfaceName}");
         }
         else
         {
@@ -88,14 +75,9 @@ public class Cable : MonoBehaviour
         }
     }
 
-    // ===============================
-    // LOG SEGMENT (nur Info)
-    // ===============================
     void CreateLogicalSegment(GameObject from, GameObject to)
     {
-        GameObject seg = new GameObject(
-            $"Segment ({from.name} → {to.name})"
-        );
+        GameObject seg = new GameObject($"Segment ({from.name} → {to.name})");
 
         seg.transform.parent = transform;
 
@@ -103,9 +85,6 @@ public class Cable : MonoBehaviour
         cs.Setup(from, to);
     }
 
-    // ===============================
-    // 🔥 ROPE SEGMENT (MIT DURCHHANG)
-    // ===============================
     void CreateRopeSegment(Transform from, Transform to)
     {
         GameObject ropeObj = new GameObject("RopeSegment");
@@ -119,14 +98,27 @@ public class Cable : MonoBehaviour
 
         float dist = Vector3.Distance(from.position, to.position);
 
-        // 🔥 HIER passiert der Durchhang
         rope.ropeLength = dist * slackMultiplier;
-
-        // Ground Layer setzen (WICHTIG)
         rope.groundLayer = LayerMask.GetMask("Ground");
 
         rope.Init(from, to);
 
         ropeObjects.Add(ropeObj);
+    }
+
+    public void SetCableColor(Color color)
+    {
+        LineRenderer[] lines = GetComponentsInChildren<LineRenderer>();
+
+        foreach (LineRenderer line in lines)
+        {
+            line.startColor = color;
+            line.endColor = color;
+
+            if (line.material != null)
+            {
+                line.material.color = color;
+            }
+        }
     }
 }

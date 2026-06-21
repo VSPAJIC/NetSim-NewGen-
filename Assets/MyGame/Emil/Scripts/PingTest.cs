@@ -2,31 +2,38 @@ using UnityEngine;
 
 public class PingTest : MonoBehaviour
 {
-    public Device sourceDevice;
-    public Device targetDevice;
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            if (sourceDevice == null || targetDevice == null)
-            {
-                Debug.Log("PingTest: Geräte nicht zugewiesen!");
-                return;
-            }
-
-            sourceDevice.Ping(targetDevice);
+            TestAllPings();
         }
+    }
 
-        if (Input.GetKeyDown(KeyCode.B))
+    void TestAllPings()
+    {
+        Device[] devices = FindObjectsOfType<Device>();
+
+        foreach (Device source in devices)
         {
-            if (sourceDevice == null)
-            {
-                Debug.Log("PingTest: Source nicht gesetzt!");
-                return;
-            }
+            if (!source.deviceName.StartsWith("PC"))
+                continue;
 
-            sourceDevice.BroadcastPing();
+            foreach (Device target in devices)
+            {
+                if (!target.deviceName.StartsWith("PC"))
+                    continue;
+
+                if (source == target)
+                    continue;
+
+                Debug.Log("================================");
+                Debug.Log($"TEST: {source.deviceName} -> {target.deviceName}");
+
+                source.Ping(target);
+            }
         }
+
+        Debug.Log("===== ALLE TESTS ABGESCHLOSSEN =====");
     }
 }

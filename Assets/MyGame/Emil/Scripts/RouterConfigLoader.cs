@@ -4,7 +4,13 @@ using System.Collections.Generic;
 
 public class RouterConfigLoader : MonoBehaviour
 {
+    [Header("Router Config")]
+    [Tooltip("Router ID für das Laden der Konfiguration aus dem persistenten Speicher.")]
     public string routerID = "Router";
+
+    [Header("Inspector Overrides")]
+    [Tooltip("Wenn aktiviert, wird die Router-Konfiguration aus dem Inspector verwendet und JSON-Dateien werden ignoriert.")]
+    public bool useInspectorConfig = false;
 
     void Start()
     {
@@ -13,6 +19,12 @@ public class RouterConfigLoader : MonoBehaviour
 
     public void LoadConfig()
     {
+        if (useInspectorConfig)
+        {
+            Debug.Log("🛠️ Inspector Router-Konfiguration wird verwendet.");
+            return;
+        }
+
         string path = Path.Combine(Application.persistentDataPath, routerID + "_router.json");
 
         Debug.Log("📂 Lade Router Config: " + path);

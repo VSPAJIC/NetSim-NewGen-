@@ -1,11 +1,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class Device : MonoBehaviour
 {
     public string deviceName;
     public List<Port> ports = new List<Port>();
+
+    private void Awake()
+    {
+        ports.Clear();
+        ports.AddRange(GetComponentsInChildren<Port>());
+    }
 
     public void Ping(Device target)
     {
@@ -17,9 +22,15 @@ public class Device : MonoBehaviour
 
         if (ports.Count == 0)
         {
-            Debug.Log("Keine Ports vorhanden!");
+            Debug.LogError($"{deviceName}: Keine Ports vorhanden!");
             return;
         }
+
+        Port sourcePort = ports[0];
+        Port targetPort = target.GetComponentInChildren<Port>();
+
+        string sourceIP = sourcePort != null ? sourcePort.ipAddress : "Keine IP";
+        string targetIP = targetPort != null ? targetPort.ipAddress : "Keine IP";
 
         Packet packet = new Packet
         {
@@ -28,15 +39,40 @@ public class Device : MonoBehaviour
             isBroadcast = false
         };
 
-        Debug.Log($"📡 {deviceName} pingt {target.deviceName}");
+        Debug.Log(
+            $"📡 Ping gestartet:\n" +
+            $"Quelle: {deviceName} ({sourceIP})\n" +
+            $"Ziel: {target.deviceName} ({targetIP})"
+        );
+
         ports[0].ReceivePacket(packet);
+
+        if (CableManager.Instance != null)
+        {
+            CableManager.Instance.ColorCablePath(packet, packet.delivered);
+        }
+
+        if (packet.delivered)
+        {
+            Debug.Log(
+                $"✅ Ping erfolgreich:\n" +
+                $"{deviceName} ({sourceIP}) → {target.deviceName} ({targetIP})"
+            );
+        }
+        else
+        {
+            Debug.LogError(
+                $"❌ Ping fehlgeschlagen:\n" +
+                $"{deviceName} ({sourceIP}) → {target.deviceName} ({targetIP})"
+            );
+        }
     }
 
     public void BroadcastPing()
     {
         if (ports.Count == 0)
         {
-            Debug.Log("Keine Ports vorhanden!");
+            Debug.LogError($"{deviceName}: Keine Ports vorhanden!");
             return;
         }
 
@@ -47,7 +83,18 @@ public class Device : MonoBehaviour
             isBroadcast = true
         };
 
-        Debug.Log($"📡 {deviceName} startet BROADCAST Ping");
+        string sourceIP = ports[0].ipAddress;
+
+        Debug.Log(
+            $"📡 Broadcast gestartet:\n" +
+            $"Quelle: {deviceName} ({sourceIP})"
+        );
+
         ports[0].ReceivePacket(packet);
+
+        if (CableManager.Instance != null)
+        {
+            CableManager.Instance.ColorCablePath(packet, packet.delivered);
+        }
     }
 }

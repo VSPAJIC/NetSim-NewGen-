@@ -1,12 +1,19 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Port : MonoBehaviour
 {
-    public Device parentDevice;
-    public Port connectedPort;
+    [HideInInspector] public Device parentDevice;
+    [HideInInspector] public Port connectedPort;
 
-    public int vlanID = -1; // nur für Switchports
+    [Header("Interface Settings")]
+    public string interfaceName = "fa0/1";
 
+    [Header("VLAN Settings")]
+    public int vlanID = 1;
+    public bool isTrunk = false;
+
+    [Header("IP Settings")]
     public string ipAddress = "";
     public string subnetMask = "";
     public string gateway = "";
@@ -18,120 +25,100 @@ public class Port : MonoBehaviour
 
     public void ConnectTo(Port other)
     {
+        parentDevice = GetComponentInParent<Device>();
+        other.parentDevice = other.GetComponentInParent<Device>();
+
         connectedPort = other;
         other.connectedPort = this;
 
-        Debug.Log($"{name} <--> {other.name}");
+        Debug.Log($"{interfaceName} <--> {other.interfaceName}");
     }
 
     public void ReceivePacket(Packet packet)
     {
+        if (packet == null)
+        {
+            Debug.LogError("Packet ist null!");
+            return;
+        }
+
+        if (packet.visitedPorts == null)
+            packet.visitedPorts = new List<Port>();
+
+        if (packet.failedPorts == null)
+            packet.failedPorts = new List<Port>();
+
         if (packet.visitedPorts.Contains(this))
             return;
 
         packet.visitedPorts.Add(this);
 
-        Debug.Log($"{name} bekommt Paket");
+        if (parentDevice == null)
+            parentDevice = GetComponentInParent<Device>();
 
-        bool isSwitchPort =
-            parentDevice.GetComponent<Switch>() != null;
-
-        // Nur PCs und Router brauchen IPs
-        if (!isSwitchPort && string.IsNullOrEmpty(ipAddress))
+        if (parentDevice == null)
         {
-            Debug.Log($"❌ {name} hat keine IP!");
+            AddFailedPort(packet, this);
+            Debug.LogError($"❌ {interfaceName} hat kein parentDevice!");
             return;
         }
 
-        // Broadcast
-        if (packet.isBroadcast)
+        Debug.Log($"{interfaceName} bekommt Paket");
+
+        bool isSwitchPort = parentDevice.GetComponent<Switch>() != null;
+
+        if (!isSwitchPort && string.IsNullOrEmpty(ipAddress))
         {
-            if (parentDevice != packet.source)
-            {
-                Debug.Log($"📡 Broadcast erreicht: {parentDevice.deviceName}");
-            }
-        }
-        else
-        {
-            if (parentDevice == packet.destination)
-            {
-                Debug.Log($"✅ {packet.source.deviceName} hat {parentDevice.deviceName} erreicht!");
-                return;
-            }
+            AddFailedPort(packet, this);
+            Debug.Log($"❌ {interfaceName} hat keine IP!");
+            return;
         }
 
-        // Netzwerkprüfung nur wenn beide Ports IPs besitzen
-        if (connectedPort != null)
+        if (!packet.isBroadcast && parentDevice == packet.destination)
         {
-            bool thisNeedsIP =
-                parentDevice.GetComponent<Switch>() == null;
-
-            bool otherNeedsIP =
-                connectedPort.parentDevice.GetComponent<Switch>() == null;
-
-            if (thisNeedsIP && otherNeedsIP)
-            {
-                if (string.IsNullOrEmpty(connectedPort.ipAddress))
-                {
-                    Debug.Log($"❌ Ziel-Port hat keine IP!");
-                    return;
-                }
-
-                if (string.IsNullOrEmpty(subnetMask))
-                {
-                    Debug.Log($"❌ {name} hat keine Subnetzmaske!");
-                    return;
-                }
-
-                bool sameNet = NetworkHelper.SameNetwork(
-                    ipAddress,
-                    connectedPort.ipAddress,
-                    subnetMask
-                );
-
-                if (!sameNet &&
-                    parentDevice.GetComponent<Router>() == null)
-                {
-                    Debug.Log($"❌ Unterschiedliches Netzwerk!");
-                    return;
-                }
-            }
+            packet.delivered = true;
+            Debug.Log($"✅ Ziel erreicht über {interfaceName}: {parentDevice.deviceName}");
+            return;
         }
 
-        // Switch
         Switch sw = parentDevice.GetComponent<Switch>();
-
         if (sw != null)
         {
             sw.ForwardPacket(packet, this);
             return;
         }
 
-        // Router
         Router router = parentDevice.GetComponent<Router>();
-
         if (router != null)
         {
             router.ForwardPacket(packet, this);
             return;
         }
 
-        // Normal weiterleiten
         if (connectedPort != null)
         {
             connectedPort.ReceivePacket(packet);
         }
         else
         {
-            Debug.Log($"{name} hat keine Verbindung!");
+            AddFailedPort(packet, this);
+            Debug.Log($"❌ {interfaceName} hat keine Verbindung!");
         }
+    }
+
+    private void AddFailedPort(Packet packet, Port port)
+    {
+        if (packet.failedPorts == null)
+            packet.failedPorts = new List<Port>();
+
+        if (!packet.failedPorts.Contains(port))
+            packet.failedPorts.Add(port);
     }
 
     public void SetIP(string ip, string subnet)
     {
         ipAddress = ip;
         subnetMask = subnet;
-
-        Debug.Log($"{name} IP gesetzt: {ip}");
+        Debug.Log($"{interfaceName} IP gesetzt: {ip}");
     }
 }
