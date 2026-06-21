@@ -23,6 +23,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MyGame/Viktor/Scene/RouterConfigScene.unity
     guid: 0969a7aa1440fb54fa21b45e890e27ad
+  - enabled: 1
+    path: Assets/MyGame/Jakob/Scene/Room.unity
+    guid: 7fe070568eb143748afa5c6813839c97
+  - enabled: 1
+    path: Assets/MyGame/Emil/Scene/MainStart.unity
+    guid: 6532b426db90d5f49889bd1bf4261ac6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
