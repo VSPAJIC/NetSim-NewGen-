@@ -12,6 +12,12 @@ public class PingTest : MonoBehaviour
 
     void TestAllPings()
     {
+        // Erst alle Kabel wieder blau machen
+        if (CableManager.Instance != null)
+        {
+            CableManager.Instance.ResetAllCableColors();
+        }
+
         Device[] devices = FindObjectsOfType<Device>();
 
         foreach (Device source in devices)

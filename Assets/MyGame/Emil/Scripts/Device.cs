@@ -45,14 +45,24 @@ public class Device : MonoBehaviour
             $"Ziel: {target.deviceName} ({targetIP})"
         );
 
-        ports[0].ReceivePacket(packet);
+        bool sourceOk = CheckGateway(sourcePort, packet, deviceName);
+        bool targetOk = CheckGateway(targetPort, packet, target.deviceName);
+
+        if (sourceOk && targetOk)
+        {
+            sourcePort.ReceivePacket(packet);
+        }
+        else
+        {
+            Debug.LogError("❌ Ping wegen falscher IP/Gateway-Konfiguration gestoppt.");
+        }
 
         if (CableManager.Instance != null)
         {
-            CableManager.Instance.ColorCablePath(packet, packet.delivered);
+            CableManager.Instance.ColorCablePath(packet, sourceOk && targetOk && packet.delivered);
         }
 
-        if (packet.delivered)
+        if (sourceOk && targetOk && packet.delivered)
         {
             Debug.Log(
                 $"✅ Ping erfolgreich:\n" +
@@ -66,6 +76,56 @@ public class Device : MonoBehaviour
                 $"{deviceName} ({sourceIP}) → {target.deviceName} ({targetIP})"
             );
         }
+    }
+    private bool CheckGateway(Port port, Packet packet, string deviceLabel)
+    {
+        if (port == null)
+            return false;
+
+        if (string.IsNullOrEmpty(port.ipAddress) ||
+            string.IsNullOrEmpty(port.subnetMask))
+        {
+            AddFailedPort(packet, port);
+            Debug.LogError($"❌ {deviceLabel} hat keine IP/Subnet.");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(port.gateway))
+        {
+            AddFailedPort(packet, port);
+            Debug.LogError($"❌ {deviceLabel} hat kein Gateway.");
+            return false;
+        }
+
+        bool gatewayOk = NetworkHelper.SameNetwork(
+            port.ipAddress,
+            port.gateway,
+            port.subnetMask
+        );
+
+        if (!gatewayOk)
+        {
+            AddFailedPort(packet, port);
+
+            Debug.LogError(
+                $"❌ Gateway falsch bei {deviceLabel}:\n" +
+                $"IP: {port.ipAddress}\n" +
+                $"Gateway: {port.gateway}\n" +
+                $"Subnet: {port.subnetMask}"
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+    private void AddFailedPort(Packet packet, Port port)
+    {
+        if (packet.failedPorts == null)
+            packet.failedPorts = new List<Port>();
+
+        if (!packet.failedPorts.Contains(port))
+            packet.failedPorts.Add(port);
     }
 
     public void BroadcastPing()

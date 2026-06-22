@@ -178,10 +178,7 @@ public class CableManager : MonoBehaviour
 
         Cable[] cables = Object.FindObjectsByType<Cable>(FindObjectsSortMode.None);
 
-        foreach (Cable cable in cables)
-            cable.SetCableColor(defaultColor);
-
-        Color pathColor = success ? successColor : failColor;
+        Color pathColor = success ? successColor : defaultColor;
 
         Port sourcePort = packet.source != null
             ? packet.source.GetComponentInChildren<Port>()
@@ -213,7 +210,6 @@ public class CableManager : MonoBehaviour
                     shouldColor = true;
             }
 
-            // WICHTIG: Start- und Ziel-PC immer mitfärben
             if (sourcePort != null && (a == sourcePort || b == sourcePort))
                 shouldColor = true;
 
@@ -224,7 +220,6 @@ public class CableManager : MonoBehaviour
                 cable.SetCableColor(pathColor);
         }
 
-        // Fehlerstellen danach rot übermalen
         if (packet.failedPorts == null)
             return;
 
