@@ -5,11 +5,9 @@ using System.Collections.Generic;
 public class RouterConfigLoader : MonoBehaviour
 {
     [Header("Router Config")]
-    [Tooltip("Router ID für das Laden der Konfiguration aus dem persistenten Speicher.")]
     public string routerID = "Router";
 
     [Header("Inspector Overrides")]
-    [Tooltip("Wenn aktiviert, wird die Router-Konfiguration aus dem Inspector verwendet und JSON-Dateien werden ignoriert.")]
     public bool useInspectorConfig = false;
 
     void Start()
@@ -22,6 +20,7 @@ public class RouterConfigLoader : MonoBehaviour
         if (useInspectorConfig)
         {
             Debug.Log("🛠️ Inspector Router-Konfiguration wird verwendet.");
+            ApplyDefaultRouterPorts();
             return;
         }
 
@@ -32,6 +31,7 @@ public class RouterConfigLoader : MonoBehaviour
         if (!File.Exists(path))
         {
             Debug.LogWarning("⚠️ Keine Router Config gefunden!");
+            ApplyDefaultRouterPorts();
             return;
         }
 
@@ -41,15 +41,29 @@ public class RouterConfigLoader : MonoBehaviour
         if (data == null)
         {
             Debug.LogError("❌ Fehler beim Laden der Router Config!");
+            ApplyDefaultRouterPorts();
             return;
         }
 
         ApplyConfig(data);
     }
 
+    void ApplyDefaultRouterPorts()
+    {
+        Port[] ports = GetComponentsInChildren<Port>(true);
+
+        foreach (Port port in ports)
+        {
+            port.vlanID = 1;
+            port.isTrunk = true;
+
+            Debug.Log($"✅ Router Standard: {port.interfaceName} → VLAN {port.vlanID}, Trunk={port.isTrunk}");
+        }
+    }
+
     void ApplyConfig(RouterConfigData data)
     {
-        Port[] ports = GetComponentsInChildren<Port>();
+        Port[] ports = GetComponentsInChildren<Port>(true);
 
         if (ports.Length == 0)
         {
@@ -57,17 +71,28 @@ public class RouterConfigLoader : MonoBehaviour
             return;
         }
 
+        foreach (Port port in ports)
+        {
+            port.vlanID = 1;
+            port.isTrunk = true;
+        }
+
+        if (data.interfaces == null)
+        {
+            Debug.LogWarning("⚠️ Keine Router-Interfaces in JSON gefunden.");
+            return;
+        }
+
         foreach (RouterInterfaceData iface in data.interfaces)
         {
-            // Beispiel: fa0/0 oder fa0/0.10
             string ifaceName = iface.interfaceName;
 
-            // 🔥 passenden Port finden
             foreach (Port port in ports)
             {
-                if (port.name.ToLower() == ifaceName.ToLower())
+                if (port.interfaceName.Trim().ToLower() == ifaceName.Trim().ToLower())
                 {
                     ApplyInterfaceConfig(port, iface.configLines);
+                    Debug.Log($"✅ Router Interface angewendet: {port.interfaceName}");
                 }
             }
         }
@@ -77,11 +102,13 @@ public class RouterConfigLoader : MonoBehaviour
 
     void ApplyInterfaceConfig(Port port, List<string> lines)
     {
+        if (lines == null)
+            return;
+
         foreach (string line in lines)
         {
             string cmd = line.Trim().ToLower();
 
-            // 🔷 IP setzen
             if (cmd.StartsWith("ip address"))
             {
                 string[] parts = cmd.Split(' ');
@@ -91,11 +118,10 @@ public class RouterConfigLoader : MonoBehaviour
                     port.ipAddress = parts[2];
                     port.subnetMask = parts[3];
 
-                    Debug.Log($"🌐 {port.name} → IP {port.ipAddress}");
+                    Debug.Log($"🌐 {port.interfaceName} → IP {port.ipAddress}");
                 }
             }
 
-            // 🔷 VLAN (Subinterface)
             if (cmd.StartsWith("encapsulation dot1q"))
             {
                 string[] parts = cmd.Split(' ');
@@ -105,8 +131,9 @@ public class RouterConfigLoader : MonoBehaviour
                     if (int.TryParse(parts[2], out int vlan))
                     {
                         port.vlanID = vlan;
+                        port.isTrunk = true;
 
-                        Debug.Log($"🏷️ {port.name} → VLAN {vlan}");
+                        Debug.Log($"🏷️ {port.interfaceName} → VLAN {vlan}, Trunk={port.isTrunk}");
                     }
                 }
             }

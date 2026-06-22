@@ -30,6 +30,7 @@ public class SwitchConfigLoader : MonoBehaviour
         if (!File.Exists(path))
         {
             Debug.LogWarning("⚠️ Keine Switch Config gefunden: " + path);
+            ApplyDefaultTrunkConfig();
             return;
         }
 
@@ -41,10 +42,24 @@ public class SwitchConfigLoader : MonoBehaviour
         if (data == null)
         {
             Debug.LogError("❌ Fehler beim Laden der Switch Config!");
+            ApplyDefaultTrunkConfig();
             return;
         }
 
         ApplyConfig(data);
+    }
+
+    private void ApplyDefaultTrunkConfig()
+    {
+        Port[] ports = GetComponentsInChildren<Port>(true);
+
+        foreach (Port port in ports)
+        {
+            port.vlanID = 1;
+            port.isTrunk = true;
+
+            Debug.Log($"✅ Standard: {port.interfaceName} → VLAN {port.vlanID}, Trunk={port.isTrunk}");
+        }
     }
 
     private void ApplyInspectorVLANs()
@@ -53,6 +68,8 @@ public class SwitchConfigLoader : MonoBehaviour
 
         foreach (Port port in ports)
         {
+            port.isTrunk = true;
+
             int vlan = port.vlanID == -1 ? 1 : port.vlanID;
             Debug.Log($"🏷️ Inspector: {port.interfaceName} VLAN {vlan}, Trunk = {port.isTrunk}");
         }
@@ -68,7 +85,7 @@ public class SwitchConfigLoader : MonoBehaviour
         {
             Debug.Log($"➡️ Switch-Port gefunden: {port.interfaceName}");
             port.vlanID = 1;
-            port.isTrunk = false;
+            port.isTrunk = true;
         }
 
         if (data.interfaceVlans == null || data.interfaceVlans.Count == 0)
@@ -80,8 +97,6 @@ public class SwitchConfigLoader : MonoBehaviour
         foreach (InterfaceVlanData iface in data.interfaceVlans)
         {
             bool found = false;
-
-            Debug.Log($"📌 JSON Interface: {iface.interfaceName} VLAN {iface.vlanId}, Trunk={iface.isTrunk}");
 
             foreach (Port port in ports)
             {
