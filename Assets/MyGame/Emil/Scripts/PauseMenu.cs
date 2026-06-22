@@ -7,13 +7,16 @@ public class PauseMenu : MonoBehaviour
 
     [Header("Player Scripts")]
     [SerializeField] private MonoBehaviour playerMovement;
-    [SerializeField] private MonoBehaviour firstPersonLook;
+    [SerializeField] private FirstPersonLook firstPersonLook;
 
     private bool isPaused = false;
+    private float originalSensitivity;
 
     private void Start()
     {
         pauseMenu.SetActive(false);
+
+        originalSensitivity = firstPersonLook.sensitivity;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -37,7 +40,7 @@ public class PauseMenu : MonoBehaviour
         pauseMenu.SetActive(true);
 
         playerMovement.enabled = false;
-        firstPersonLook.enabled = false;
+        firstPersonLook.sensitivity = 0f;
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -50,11 +53,9 @@ public class PauseMenu : MonoBehaviour
         pauseMenu.SetActive(false);
 
         playerMovement.enabled = true;
-        firstPersonLook.enabled = true;
+        firstPersonLook.sensitivity = originalSensitivity;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-
-
 }
